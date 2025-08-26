@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDO Manager - Sistema de Registro</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS -->
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-header .badge {
+            font-size: 0.7rem;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border: none;
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+            border: none;
+        }
+
+        .btn-pdf {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        .btn-pdf:hover {
+            background-color: #c0392b;
+            color: white;
+        }
+
+        .section-title {
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 10px;
+            margin: 20px 0;
+            color: var(--dark-color);
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .image-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .image-actions {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .function-item {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-buttons {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-size: 20px;
+        }
+
+        .clima-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .clima-option {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clima-option:hover {
+            border-color: var(--secondary-color);
+        }
+
+        .clima-option.selected {
+            border-color: var(--secondary-color);
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .clima-option i {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .time-inputs .form-control {
+            flex: 1;
+        }
+
+        .progress-bar-container {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        @media print {
+            .navbar, .btn, .footer, .print-btn, .action-buttons {
+                display: none !important;
+            }
+            
+            .card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+            
+            .container {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                margin-bottom: 15px;
+            }
+            
+            .display-4 {
+                font-size: 2rem;
+            }
+            
+            .time-inputs {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .clima-option {
+                min-width: calc(50% - 10px);
+            }
+            
+            .action-buttons {
+                bottom: 90px;
+                right: 15px;
+            }
+            
+            .action-btn, .print-btn {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-hard-hat me-2"></i>
+                RDO Manager
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i> Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-history me-1"></i> Histórico</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-cog me-1"></i> Configurações</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toast para notificações -->
+    <div class="toast-container">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">RDO Manager</strong>
+                <small>Agora</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body"></div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="text-center">
+            <div class="spinner-border mb-3" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p>Gerando documento Word...</p>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="container mt-3">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="form-progress"></div>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="container mt-4">
+        <h1 class="display-4 text-center mb-4">Registro Diário de Obra - RDO</h1>
+        
+        <form id="rdoForm">
+            <!-- Dados Básicos -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <i class="fas fa-info-circle me-2"></i>Dados Básicos
+                    </div>
+                    <span class="badge bg-secondary">Obrigatório</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="obra" class="form-label">Obra</label>
+                            <input type="text" class="form-control" id="obra" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="data" class="form-label">Data</label>
+                            <input type="date" class="form-control" id="data" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="turno" class="form-label">Turno</label>
+                            <select class="form-select" id="turno" required>
+                                <option value="">Selecione...</option>
+                                <option value="manha">Manhã (06:00 - 12:00)</option>
+                                <option value="tarde">Tarde (12:00 - 18:00)</option>
+                                <option value="noite">Noite (18:00 - 00:00)</option>
+                                <option value="integral">Integral (06:00 - 18:00)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="encarregado" class="form-label">Encarregado</label>
+                            <input type="text" class="form-control" id="encarregado" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="empreiteira" class="form-label">Empreiteira</label>
+                            <input type="text" class="form-control" id="empreiteira">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Condições Climáticas -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <i class="fas fa-cloud-sun me-2"></i>Condições Climáticas
+                    </div>
+                    <span class="badge bg-secondary">Obrigatório</span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tempo durante o dia</label>
+                        <div class="clima-selector">
+                            <div class="clima-option" data-clima="ensolarado">
+                                <i class="fas fa-sun"></i>
+                                <span>Ensolarado</span>
+                            </div>
+                            <div class="clima-option" data-clima="nublado">
+                                <i class="fas fa-cloud"></i>
+                                <span>Nublado</span>
+                            </div>
+                            <div class="clima-option" data-clima="chuvoso">
+                                <i class="fas fa-cloud-rain"></i>
+                                <span>Chuvoso</span>
+                            </div>
+                            <div class="clima-option" data-clima="tempestuoso">
+                                <i class="fas fa-poo-storm"></i>
+                                <span>Tempestuoso</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="clima" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Atividades Realizadas -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <i class="fas fa-tasks me-2"></i>Atividades Realizadas
+                    </div>
+                    <span class="badge bg-secondary">Obrigatório</span>
+                </div>
+                <div class="card-body">
+                    <div id="atividades-container">
+                        <div class="function-item">
+                            <div class="mb-3">
+                                <label class="form-label">Descrição da Atividade</label>
+                                <textarea class="form-control" name="atividade[]" rows="3" required placeholder="Descreva detalhadamente a atividade realizada..."></textarea>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-danger remove-item">
+                                <i class="fas fa-trash me-1"></i>Remover
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary mt-2" id="add-atividade">
+                        <i class="fas fa-plus me-1"></i>Adicionar Atividade
+                    </button>
+                </div>
+            </div>
+
+            <!-- Equipe -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <i class="fas fa-users me-2"></i>Equipe
+                    </div>
+                    <span class="badge bg-secondary">Obrigatório</span>
+                </div>
+                <div class="card-body">
+                    <div id="equipe-container">
+                        <div class="function-item">
+                            <div class="row">
+                                <div class="col-md-5 mb-3">
+                                    <label class="form-label">Nome do Funcionário</label>
+                                    <input type="text" class="form-control" name="funcionario[]" required>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Função</label>
+                                    <select class="form-select" name="funcao[]">
+                                        <option value="">Selecione...</option>
+                                        <option value="Soldador">Soldador</option>
+                                        <option value="Caldeireiro">Caldeireiro</option>
+                                        <option value="Mecânico">Mecânico</option>
+                                        <option value="Auxiliar">Auxiliar</option>
+                                        <option value="Encarregado">Encarregado</option>
+                                        <option value="Supervisor">Supervisor</option>
+                                        <option value="Planejador">Planejador</option>
+                                        <option value="Técnico de Segurança">Técnico de Segurança</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Horário de Trabalho</label>
+                                    <div class="time-inputs">
+                                        <input type="time" class="form-control" name="entrada[]">
+                                        <input type="time" class="form-control" name="saida[]">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-danger remove-item">
+                                <i class="fas fa-trash me-1"></i>Remover
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary mt-2" id="add-funcionario">
+                        <i class="fas fa-user-plus me-1"></i>Adicionar Funcionário
+                    </button>
+                </div>
+            </div>
+
+            <!-- Equipamentos e Materiais -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-tools me-2"></i>Equipamentos e Materiais
+                </div>
+                <div class="card-body">
+                    <div id="equipamentos-container">
+                        <div class="function-item">
+                            <div class="row">
+                                <div class="col-md-5 mb-3">
+                                    <label class="form-label">Equipamento/Material</label>
+                                    <input type="text" class="form-control" name="equipamento[]">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Quantidade</label>
+                                    <input type="number" class="form-control" name="quantidade_equip[]">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" name="status_equip[]">
+                                        <option value="">Selecione...</option>
+                                        <option value="operante">Operante</option>
+                                        <option value="defeito">Com Defeito</option>
+                                        <option value="manutencao">Em Manutenção</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-danger remove-item">
+                                <i class="fas fa-trash me-1"></i>Remover
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary mt-2" id="add-equipamento">
+                        <i class="fas fa-plus me-1"></i>Adicionar Equipamento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Anexos de Fotos -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-camera me-2"></i>Anexos de Fotos
+                </div>
+                <div class="card-body">
+                    <div class="row" id="fotos-container">
+                        <div class="col-md-4 mb-3">
+                            <div class="image-preview">
+                                <span class="text-muted">Pré-visualização da imagem</span>
+                            </div>
+                            <input type="file" class="form-control foto-input" accept="image/*">
+                            <div class="mt-2">
+                                <input type="text" class="form-control form-control-sm foto-legenda" placeholder="Legenda da foto">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary mt-2" id="add-foto">
+                        <i class="fas fa-plus me-1"></i>Adicionar Mais Fotos
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-5">
+                <button type="button" class="btn btn-danger me-md-2" id="clearAll">
+                    <i class="fas fa-trash me-1"></i>Excluir Tudo
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>Salvar e Exportar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <div class="container">
+            <p>RDO Manager &copy; 2025 - Thaynison Couto</p>
+            <p class="small">Desenvolvido para gerenciamento e controle de atividades em serviços</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap & jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- docx.js via CDN corrigido -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Inicializar toast
+            const toastEl = document.getElementById('liveToast');
+            const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+            
+            // Função para mostrar loading
+            function showLoading() {
+                $('#loadingOverlay').show();
+            }
+            
+            // Função para esconder loading
+            function hideLoading() {
+                $('#loadingOverlay').hide();
+            }
+            
+            // Função para exportar para Word
+            function exportToWord(formData) {
+                return new Promise((resolve, reject) => {
+                    try {
+                        // Verificar se a biblioteca docx está carregada
+                        if (typeof docx === 'undefined') {
+                            reject("Erro: Biblioteca de exportação não carregada.");
+                            return;
+                        }
+                        
+                        const { Document, Paragraph, Table, TableRow, TableCell, HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType } = docx;
+                        
+                        // Funções auxiliares para formatar os dados
+                        function formatClimaText(clima) {
+                            const climaTexts = {
+                                "ensolarado": "Ensolarado durante todo o dia",
+                                "nublado": "Nublado durante todo o dia",
+                                "chuvoso": "Chuvoso durante todo o dia",
+                                "tempestuoso": "Tempestuoso durante todo o dia"
+                            };
+                            return climaTexts[clima] || "Condições climáticas não especificadas";
+                        }
+
+                        function formatarData(data) {
+                            if (!data) return "Não informado";
+                            const [ano, mes, dia] = data.split('-');
+                            return `${dia}/${mes}/${ano}`;
+                        }
+
+                        function formatarTurno(turno) {
+                            const turnos = {
+                                "manha": "Manhã (06:00 - 12:00)",
+                                "tarde": "Tarde (12:00 - 18:00)",
+                                "noite": "Noite (18:00 - 00:00)",
+                                "integral": "Integral (06:00 - 18:00)"
+                            };
+                            return turnos[turno] || "Não informado";
+                        }
+
+                        function createTableFromObject(dataObj) {
+                            const rows = Object.entries(dataObj).map(([key, value]) => {
+                                return new TableRow({
+                                    children: [
+                                        new TableCell({
+                                            children: [new Paragraph({ text: key })],
+                                            shading: { fill: "D3D3D3", type: ShadingType.SOLID }
+                                        }),
+                                        new TableCell({
+                                            children: [new Paragraph({ text: value || "Não informado" })]
+                                        })
+                                    ]
+                                });
+                            });
+                            
+                            return new Table({
+                                width: { size: 100, type: WidthType.PERCENTAGE },
+                                borders: {
+                                    all: { style: BorderStyle.SINGLE, size: 1, color: "auto" }
+                                },
+                                rows: rows
+                            });
+                        }
+
+                        function createActivitiesList(activities) {
+                            if (!activities || activities.length === 0) {
+                                return [new Paragraph({ text: "Nenhuma atividade registrada.", spacing: { after: 200 } })];
+                            }
+                            
+                            return activities.map(activity => {
+                                return new Paragraph({
+                                    text: `• ${activity}`,
+                                    spacing: { after: 50 }
+                                });
+                            });
+                        }
+
+                        function createTeamTable(team) {
+                            if (!team || team.length === 0) {
+                                return new Paragraph({ text: "Nenhum membro da equipe registrado.", spacing: { after: 200 } });
+                            }
+                            
+                            const headerRow = new TableRow({
+                                children: [
+                                    new TableCell({
+                                        children: [new Paragraph({ text: "Nome" })],
+                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
+                                    }),
+                                    new TableCell({
+                                        children: [new Paragraph({ text: "Função" })],
+                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
+                                    }),
+                                    new TableCell({
+                                        children: [new Paragraph({ text: "Entrada" })],
+                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
+                                    }),
+                                    new TableCell({
+                                        children: [new Paragraph({ text: "Saída" })],
+                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
+                                    })
+                                ]
+                            });
+                            
+                            const teamRows = team.map(member => {
+                                return new TableRow({
+                                    children: [
+                                        new TableCell({
+                                            children: [new Paragraph({ text: member.nome || "Não informado" })]
+                                        }),
+                                        new TableCell({
+                                            children: [new Paragraph({ text: member.funcao || "Não informado" })]
+                                        }),
+                                        new TableCell({
+                                            children: [new Paragraph({ text: member.entrada || "Não informado" })]
+                                        }),
+                                        new TableCell({
+                                            children: [new Paragraph({ text: member.saida || "Não informado" })]
+                                        })
+                                    ]
+                                });
+                            });
+                            
+                            return new Table({
+                                width: { size: 100, type: WidthType.PERCENTAGE },
+                                borders: {
+                                    all: { style: BorderStyle.SINGLE, size: 1, color: "auto" }
+                                },
+                                rows: [headerRow, ...teamRows]
+                            });
+                        }
+
+                        function createEquipmentTable(equipment) {
+                            if (!equipment || equipment.length === 0) {
+                                return new Paragraph({ text: "Nenhum equipamento ou material registrado.", spacing: { after: 200 } });
+                            }
+                            
+                            const headerRow = new TableRow({
+                                children: [
+                                    new TableCell({
+                                        children: [new Paragraph({ text: "Equipamento/Material" })],
+                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
+                                    }),
+                                    new TableCell({
+                                        children: [new Paragraph({ text: "Quantidade" })],
+                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
+                                    }),
+                                    new TableCell({
+                                        children: [new Paragraph({ text: "Status" })],
+                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
+                                    })
+                                ]
+                            });
+                            
+                            const equipmentRows = equipment.map(item => {
+                                function formatStatus(status) {
+                                    const statusTexts = {
+                                        "operante": "Operante",
+                                        "defeito": "Com Defeito",
+                                        "manutencao": "Em Manutenção"
+                                    };
+                                    return statusTexts[status] || "Não informado";
+                                }
+                                
+                                return new TableRow({
+                                    children: [
+                                        new TableCell({
+                                            children: [new Paragraph({ text: item.equipamento || "Não informado" })]
+                                        }),
+                                        new TableCell({
+                                            children: [new Paragraph({ text: item.quantidade || "Não informado" })]
+                                        }),
+                                        new TableCell({
+                                            children: [new Paragraph({ text: formatStatus(item.status) })]
+                                        })
+                                    ]
+                                });
+                            });
+                            
+                            return new Table({
+                                width: { size: 100, type: WidthType.PERCENTAGE },
+                                borders: {
+                                    all: { style: BorderStyle.SINGLE, size: 1, color: "auto" }
+                                },
+                                rows: [headerRow, ...equipmentRows]
+                            });
+                        }
+
+                        function createPhotosList(photos) {
+                            if (!photos || photos.length === 0) {
+                                return [new Paragraph({ text: "Nenhuma foto anexada.", spacing: { after: 200 } })];
+                            }
+                            
+                            return photos.map(photo => {
+                                return new Paragraph({
+                                    text: `• ${photo.nome}${photo.legenda ? ` - ${photo.legenda}` : ''}`,
+                                    spacing: { after: 50 }
+                                });
+                            });
+                        }
+
+                        // Criar um novo documento
+                        const doc = new Document({
+                            sections: [{
+                                properties: {},
+                                children: [
+                                    // Título do documento
+                                    new Paragraph({
+                                        text: "REGISTRO DIÁRIO DE OBRA - RDO",
+                                        heading: HeadingLevel.HEADING_1,
+                                        alignment: AlignmentType.CENTER,
+                                        spacing: { after: 400 }
+                                    }),
+                                    
+                                    // Dados Básicos
+                                    new Paragraph({
+                                        text: "DADOS BÁSICOS",
+                                        heading: HeadingLevel.HEADING_2,
+                                        spacing: { before: 400, after: 200 }
+                                    }),
+                                    createTableFromObject({
+                                        "Obra": formData.obra,
+                                        "Data": formatarData(formData.data),
+                                        "Turno": formatarTurno(formData.turno),
+                                        "Encarregado": formData.encarregado,
+                                        "Empreiteira": formData.empreiteira || "Não informado"
+                                    }),
+                                    
+                                    // Condições Climáticas
+                                    new Paragraph({
+                                        text: "CONDIÇÕES CLIMÁTICAS",
+                                        heading: HeadingLevel.HEADING_2,
+                                        spacing: { before: 400, after: 200 }
+                                    }),
+                                    new Paragraph({
+                                        text: formatClimaText(formData.clima),
+                                        spacing: { after: 400 }
+                                    }),
+                                    
+                                    // Atividades Realizadas
+                                    new Paragraph({
+                                        text: "ATIVIDADES REALIZADAS",
+                                        heading: HeadingLevel.HEADING_2,
+                                        spacing: { before: 400, after: 200 }
+                                    }),
+                                    ...createActivitiesList(formData.atividades),
+                                    
+                                    // Equipe
+                                    new Paragraph({
+                                        text: "EQUIPE",
+                                        heading: HeadingLevel.HEADING_2,
+                                        spacing: { before: 400, after: 200 }
+                                    }),
+                                    createTeamTable(formData.equipe),
+                                    
+                                    // Equipamentos e Materiais
+                                    new Paragraph({
+                                        text: "EQUIPAMENTOS E MATERIAIS",
+                                        heading: HeadingLevel.HEADING_2,
+                                        spacing: { before: 400, after: 200 }
+                                    }),
+                                    createEquipmentTable(formData.equipamentos),
+                                    
+                                    // Fotos (apenas legendas)
+                                    formData.fotos.length > 0 ? new Paragraph({
+                                        text: "FOTOS ANEXADAS",
+                                        heading: HeadingLevel.HEADING_2,
+                                        spacing: { before: 400, after: 200 }
+                                    }) : new Paragraph({}),
+                                    ...createPhotosList(formData.fotos),
+                                    
+                                    // Rodapé com data e hora de emissão
+                                    new Paragraph({
+                                        text: `Documento gerado em: ${new Date().toLocaleString('pt-BR')}`,
+                                        alignment: AlignmentType.RIGHT,
+                                        spacing: { before: 800 }
+                                    })
+                                ]
+                            }]
+                        });
+
+                        // Gerar o documento
+                        docx.Packer.toBlob(doc).then(blob => {
+                            // Criar URL para download
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement("a");
+                            link.href = url;
+                            link.download = `RDO_${formData.obra}_${formData.data.replace(/-/g, '')}.docx`;
+                            document.body.appendChild(link);
+                            
+                            // Usar setTimeout para evitar problemas com extensões
+                            setTimeout(() => {
+                                link.click();
+                                setTimeout(() => {
+                                    document.body.removeChild(link);
+                                    URL.revokeObjectURL(url);
+                                    resolve();
+                                }, 100);
+                            }, 100);
+                        }).catch(error => {
+                            console.error("Erro ao gerar documento:", error);
+                            reject("Erro ao gerar documento Word.");
+                        });
+                    } catch (error) {
+                        console.error("Erro na exportação para Word:", error);
+                        reject("Erro ao exportar para Word.");
+                    }
+                });
+            }
+
+            function showToast(message, type = 'success') {
+                $('.toast-body').text(message);
+                $('.toast').removeClass('bg-success bg-danger');
+                
+                if (type === 'error') {
+                    $('.toast').addClass('bg-danger text-white');
+                } else {
+                    $('.toast').addClass('bg-success text-white');
+                }
+                
+                toast.show();
+            }
+
+            // Definir data atual como padrão
+            const today = new Date().toISOString().split('T')[0];
+            $("#data").val(today);
+            
+            // Atualizar barra de progresso
+            function updateProgress() {
+                const totalFields = 15; // Aproximação de campos importantes
+                let filledFields = 0;
+                
+                // Verificar campos obrigatórios
+                $("#rdoForm input[required], #rdoForm select[required], #rdoForm textarea[required]").each(function() {
+                    if ($(this).val() !== '') {
+                        filledFields++;
+                    }
+                });
+                
+                // Calcular porcentagem
+                const percentage = (filledFields / totalFields) * 100;
+                $("#form-progress").css('width', percentage + '%');
+                
+                // Mudar cor baseada na porcentagem
+                if (percentage < 30) {
+                    $("#form-progress").css('background-color', '#e74c3c');
+                } else if (percentage < 70) {
+                    $("#form-progress").css('background-color', '#f39c12');
+                } else {
+                    $("#form-progress").css('background-color', '#27ae60');
+                }
+            }
+            
+            // Atualizar progresso quando os campos mudam
+            $("#rdoForm input, #rdoForm select, #rdoForm textarea").on('input change', updateProgress);
+            
+            // Inicializar progresso
+            updateProgress();
+            
+            // Seleção de condições climáticas
+            $(".clima-option").click(function() {
+                $(".clima-option").removeClass("selected");
+                $(this).addClass("selected");
+                $("#clima").val($(this).data("clima"));
+                updateProgress();
+            });
+            
+            // Adicionar nova atividade
+            $("#add-atividade").click(function() {
+                $("#atividades-container").append(`
+                    <div class="function-item">
+                        <div class="mb-3">
+                            <label class="form-label">Descrição da Atividade</label>
+                            <textarea class="form-control" name="atividade[]" rows="3" required placeholder="Descreva detalhadamente a atividade realizada..."></textarea>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-danger remove-item">
+                            <i class="fas fa-trash me-1"></i>Remover
+                        </button>
+                    </div>
+                `);
+            });
+
+            // Adicionar novo funcionário
+            $("#add-funcionario").click(function() {
+                $("#equipe-container").append(`
+                    <div class="function-item">
+                        <div class="row">
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label">Nome do Funcionário</label>
+                                <input type="text" class="form-control" name="funcionario[]" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Função</label>
+                                <select class="form-select" name="funcao[]">
+                                    <option value="">Selecione...</option>
+                                    <option value="Soldador">Soldador</option>
+                                    <option value="Caldeireiro">Caldeireiro</option>
+                                    <option value="Mecânico">Mecânico</option>
+                                    <option value="Auxiliar">Auxiliar</option>
+                                    <option value="Encarregado">Encarregado</option>
+                                    <option value="Supervisor">Supervisor</option>
+                                    <option value="Planejador">Planejador</option>
+                                    <option value="Técnico de Segurança">Técnico de Segurança</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Horário de Trabalho</label>
+                                <div class="time-inputs">
+                                    <input type="time" class="form-control" name="entrada[]">
+                                    <input type="time" class="form-control" name="saida[]">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-danger remove-item">
+                            <i class="fas fa-trash me-1"></i>Remover
+                        </button>
+                    </div>
+                `);
+            });
+
+            // Adicionar novo equipamento
+            $("#add-equipamento").click(function() {
+                $("#equipamentos-container").append(`
+                    <div class="function-item">
+                        <div class="row">
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label">Equipamento/Material</label>
+                                <input type="text" class="form-control" name="equipamento[]">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Quantidade</label>
+                                <input type="number" class="form-control" name="quantidade_equip[]">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status_equip[]">
+                                    <option value="">Selecione...</option>
+                                    <option value="operante">Operante</option>
+                                    <option value="defeito">Com Defeito</option>
+                                    <option value="manutencao">Em Manutenção</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-danger remove-item">
+                            <i class="fas fa-trash me-1"></i>Remover
+                        </button>
+                    </div>
+                `);
+            });
+
+            // Adicionar mais fotos
+            $("#add-foto").click(function() {
+                $("#fotos-container").append(`
+                    <div class="col-md-4 mb-3">
+                        <div class="image-preview">
+                            <span class="text-muted">Pré-visualização da imagem</span>
+                        </div>
+                        <input type="file" class="form-control foto-input" accept="image/*">
+                        <div class="mt-2">
+                            <input type="text" class="form-control form-control-sm foto-legenda" placeholder="Legenda da foto">
+                        </div>
+                    </div>
+                `);
+            });
+
+            // Remover itens
+            $(document).on("click", ".remove-item", function() {
+                $(this).closest(".function-item").remove();
+            });
+
+            // Preview de imagem
+            $(document).on("change", ".foto-input", function(e) {
+                const previewDiv = $(this).prev(".image-preview");
+                const file = e.target.files[0];
+                
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        previewDiv.html(`<img src="${e.target.result}" alt="Preview">`);
+                    }
+                    
+                    reader.readAsDataURL(file);
+                } else {
+                    previewDiv.html('<span class="text-muted">Pré-visualização da imagem</span>');
+                }
+            });
+
+            // Limpar formulário
+            $("#clearAll").click(function() {
+                if (confirm("Tem certeza que deseja limpar todos os dados do formulário?")) {
+                    $("#rdoForm")[0].reset();
+                    $(".image-preview").html('<span class="text-muted">Pré-visualização da imagem</span>');
+                    $(".clima-option").removeClass("selected");
+                    $("#atividades-container, #equipe-container, #equipamentos-container").html(`
+                        <div class="function-item">
+                            <div class="mb-3">
+                                <label class="form-label">Descrição da Atividade</label>
+                                <textarea class="form-control" name="atividade[]" rows="3" required placeholder="Descreva detalhadamente a atividade realizada..."></textarea>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-danger remove-item">
+                                <i class="fas fa-trash me-1"></i>Remover
+                            </button>
+                        </div>
+                    `);
+                    $("#fotos-container").html(`
+                        <div class="col-md-4 mb-3">
+                            <div class="image-preview">
+                                <span class="text-muted">Pré-visualização da imagem</span>
+                            </div>
+                            <input type="file" class="form-control foto-input" accept="image/*">
+                            <div class="mt-2">
+                                <input type="text" class="form-control form-control-sm foto-legenda" placeholder="Legenda da foto">
+                            </div>
+                        </div>
+                    `);
+                    updateProgress();
+                    showToast("Formulário limpo com sucesso!", "success");
+                }
+            });
+
+            // Enviar formulário
+            $("#rdoForm").submit(async function(e) {
+                e.preventDefault();
+                
+                // Validar formulário
+                if (!this.checkValidity()) {
+                    this.reportValidity();
+                    showToast("Por favor, preencha todos os campos obrigatórios.", "error");
+                    return;
+                }
+                
+                // Verificar se condições climáticas foram selecionadas
+                if (!$("#clima").val()) {
+                    showToast("Por favor, selecione as condições climáticas.", "error");
+                    return;
+                }
+                
+                // Coletar dados do formulário
+                const formData = {
+                    obra: $("#obra").val(),
+                    data: $("#data").val(),
+                    turno: $("#turno").val(),
+                    encarregado: $("#encarregado").val(),
+                    empreiteira: $("#empreiteira").val(),
+                    clima: $("#clima").val(),
+                    atividades: [],
+                    equipe: [],
+                    equipamentos: [],
+                    fotos: []
+                };
+                
+                // Coletar atividades
+                $("textarea[name='atividade[]']").each(function() {
+                    if ($(this).val().trim() !== '') {
+                        formData.atividades.push($(this).val());
+                    }
+                });
+                
+                // Coletar equipe
+                $(".function-item", "#equipe-container").each(function() {
+                    const nome = $(this).find("input[name='funcionario[]']").val();
+                    const funcao = $(this).find("select[name='funcao[]']").val();
+                    const entrada = $(this).find("input[name='entrada[]']").val();
+                    const saida = $(this).find("input[name='saida[]']").val();
+                    
+                    if (nome || funcao || entrada || saida) {
+                        formData.equipe.push({
+                            nome: nome,
+                            funcao: funcao,
+                            entrada: entrada,
+                            saida: saida
+                        });
+                    }
+                });
+                
+                // Coletar equipamentos
+                $(".function-item", "#equipamentos-container").each(function() {
+                    const equipamento = $(this).find("input[name='equipamento[]']").val();
+                    const quantidade = $(this).find("input[name='quantidade_equip[]']").val();
+                    const status = $(this).find("select[name='status_equip[]']").val();
+                    
+                    if (equipamento || quantidade || status) {
+                        formData.equipamentos.push({
+                            equipamento: equipamento,
+                            quantidade: quantidade,
+                            status: status
+                        });
+                    }
+                });
+                
+                // Coletar informações das fotos (apenas nomes e legendas)
+                $(".foto-input").each(function(index) {
+                    const file = this.files[0];
+                    const legenda = $(this).siblings(".mt-2").find(".foto-legenda").val();
+                    
+                    if (file) {
+                        formData.fotos.push({
+                            nome: file.name,
+                            legenda: legenda
+                        });
+                    }
+                });
+                
+                // Mostrar loading
+                showLoading();
+                
+                try {
+                    // Exportar para Word
+                    await exportToWord(formData);
+                    
+                    // Salvar no localStorage (apenas para demonstração)
+                    const timestamp = new Date().getTime();
+                    localStorage.setItem(`rdo_${timestamp}`, JSON.stringify(formData));
+                    
+                    showToast("RDO salvo com sucesso! Download do documento iniciado.", "success");
+                } catch (error) {
+                    console.error("Erro ao exportar:", error);
+                    showToast(error, "error");
+                } finally {
+                    // Esconder loading
+                    hideLoading();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
