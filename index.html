@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RDO Manager - Sistema de Registro</title>
+    <title>Relatório Diario - Sistema de Registro</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- CSS -->
     <style>
         :root {
-            --primary-color: #2c3e50;
+            --primary-color: #002060;
             --secondary-color: #3498db;
             --accent-color: #e74c3c;
             --success-color: #27ae60;
             --light-color: #ecf0f1;
-            --dark-color: #2c3e50;
+            --dark-color: #002060;
         }
 
         body {
@@ -71,18 +71,7 @@
             background-color: var(--accent-color);
             border: none;
         }
-
-        .btn-pdf {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-        }
-
-        .btn-pdf:hover {
-            background-color: #c0392b;
-            color: white;
-        }
-
+        
         .section-title {
             border-left: 4px solid var(--secondary-color);
             padding-left: 10px;
@@ -251,48 +240,374 @@
             font-size: 1.5rem;
         }
 
+        /* Estilos para o PDF */
+        #pdf-container {
+            display: none;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: white;
+            color: black;
+        }
+
+        .pdf-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #002060;
+            padding-bottom: 10px;
+        }
+
+        .pdf-section {
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+        }
+
+        .pdf-section-title {
+            background-color: #002060;
+            color: white;
+            padding: 8px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        .pdf-table th, .pdf-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .pdf-table th {
+            background-color: #f2f2f2;
+        }
+
+        .pdf-image-container {
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+        }
+
+        .pdf-image {
+            max-width: 100%;
+            max-height: 300px;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .pdf-image-caption {
+            font-style: italic;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        /* NOVOS ESTILOS PARA PDF MELHORADO */
+        .pdf-logo {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .pdf-logo img {
+            max-height: 70px;
+        }
+        
+        .pdf-header h1 {
+            color: #002060;
+            font-size: 24px;
+            margin: 10px 0 5px 0;
+        }
+        
+        .pdf-header p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .pdf-info-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .pdf-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .pdf-info-item {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 10px;
+        }
+        
+        .pdf-info-label {
+            font-weight: bold;
+            color: #002060;
+            margin-bottom: 3px;
+        }
+        
+        .pdf-images-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .pdf-image-wrapper {
+            width: calc(33.333% - 10px);
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+        }
+        
+        .pdf-image-box {
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 5px;
+            background: white;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .pdf-image-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .signature-section {
+            margin-top: 30px;
+            page-break-inside: avoid;
+        }
+        
+        .signature-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #002060;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .signature-grid {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .signature-box {
+            width: 23%;
+            min-width: 150px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .signature-line {
+            height: 1px;
+            background-color: #000;
+            margin: 40px 0 10px 0;
+        }
+        
+        .signature-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .signature-role {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .pdf-footer {
+            margin-top: 30px;
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        /* MELHORIAS NO CSS DE IMPRESSÃO */
         @media print {
-            .navbar, .btn, .footer, .print-btn, .action-buttons {
+            body, html {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                font-size: 10pt !important;
+                line-height: 1.2 !important;
+                background: white !important;
+                color: black !important;
+            }
+            
+            .navbar, .btn, .footer, .print-btn, .action-buttons,
+            .toast-container, .progress-bar-container {
                 display: none !important;
             }
             
-            .card {
-                box-shadow: none;
-                border: 1px solid #ddd;
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0.1in !important;
+                margin: 0 !important;
             }
             
-            .container {
-                width: 100%;
-                max-width: 100%;
+            #rdoForm, .container {
+                display: none !important;
+            }
+
+            #pdf-container {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0.2in !important;
+                font-size: 10pt !important;
+                position: relative;
+                min-height: 100vh;
+                box-sizing: border-box;
+            }
+            
+            .pdf-header {
+                margin-bottom: 0.2in !important;
+                padding-bottom: 0.1in !important;
+            }
+            
+            .pdf-header h1 {
+                font-size: 14pt !important;
+                margin: 5px 0 !important;
+            }
+            
+            .pdf-header p {
+                font-size: 9pt !important;
+                margin: 0 !important;
+            }
+            
+            .pdf-info-box {
+                padding: 0.1in !important;
+                margin-bottom: 0.2in !important;
+            }
+            
+            .pdf-info-item {
+                margin-bottom: 0.05in !important;
+                min-width: auto !important;
+            }
+            
+            .pdf-info-label {
+                font-size: 9pt !important;
+                margin-bottom: 0.02in !important;
+            }
+            
+            .pdf-section {
+                margin-bottom: 0.15in !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .pdf-section-title {
+                padding: 0.08in !important;
+                font-size: 10pt !important;
+                margin-bottom: 0.08in !important;
+            }
+            
+            .pdf-table {
+                font-size: 9pt !important;
+                margin-bottom: 0.1in !important;
+            }
+            
+            .pdf-table th, .pdf-table td {
+                padding: 0.06in !important;
+            }
+            
+            .pdf-images-grid {
+                gap: 0.1in !important;
+                margin-bottom: 0.1in !important;
+            }
+            
+            .pdf-image-wrapper {
+                width: calc(50% - 0.05in) !important;
+                margin-bottom: 0.1in !important;
+            }
+            
+            .pdf-image-box {
+                height: 1.2in !important;
+                padding: 0.05in !important;
+            }
+            
+            .pdf-image-caption {
+                font-size: 8pt !important;
+            }
+            
+            .signature-section {
+                position: fixed;
+                bottom: 0.8in;
+                left: 0.2in;
+                right: 0.2in;
+                margin-top: 0.2in !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .signature-title {
+                margin-bottom: 0.1in !important;
+                font-size: 10pt !important;
+                padding-bottom: 0.05in !important;
+            }
+            
+            .signature-line {
+                margin: 0.3in 0 0.05in 0 !important;
+            }
+            
+            .signature-name {
+                font-size: 9pt !important;
+                margin-bottom: 0.02in !important;
+            }
+            
+            .signature-role {
+                font-size: 8pt !important;
+            }
+            
+            .pdf-footer {
+                position: fixed;
+                bottom: 0.2in;
+                left: 0.2in;
+                right: 0.2in;
+                margin-top: 0.2in !important;
+                font-size: 9pt !important;
+                padding-top: 0.05in !important;
+                border-top: 1px solid #ddd !important;
+            }
+            
+            /* Garantir que não haja quebras desnecessárias */
+            .avoid-break {
+                page-break-inside: avoid !important;
+            }
+            
+            /* Reduzir espaçamento em listas */
+            ol, ul {
+                padding-left: 0.2in !important;
+                margin-bottom: 0.1in !important;
+            }
+            
+            li {
+                margin-bottom: 0.05in !important;
+            }
+
+            /* Adicionar margem inferior ao conteúdo principal para evitar sobreposição */
+            .pdf-content {
+                margin-bottom: 2in !important;
             }
         }
 
+        /* Ajustes adicionais para melhor visualização em mobile */
         @media (max-width: 768px) {
-            .card {
-                margin-bottom: 15px;
-            }
-            
-            .display-4 {
-                font-size: 2rem;
-            }
-            
-            .time-inputs {
-                flex-direction: column;
-                gap: 5px;
-            }
-            
-            .clima-option {
-                min-width: calc(50% - 10px);
-            }
-            
-            .action-buttons {
-                bottom: 90px;
-                right: 15px;
-            }
-            
-            .action-btn, .print-btn {
-                width: 50px;
-                height: 50px;
+            .pdf-image-wrapper {
+                width: 100% !important;
             }
         }
     </style>
@@ -305,7 +620,7 @@
         <div class="container">
             <a class="navbar-brand" href="#">
                 <i class="fas fa-hard-hat me-2"></i>
-                RDO Manager
+                Relatório Diario
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -330,21 +645,11 @@
     <div class="toast-container">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
-                <strong class="me-auto">RDO Manager</strong>
+                <strong class="me-auto">Relatório Diario</strong>
                 <small>Agora</small>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body"></div>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
-        <div class="text-center">
-            <div class="spinner-border mb-3" role="status">
-                <span class="visually-hidden">Carregando...</span>
-            </div>
-            <p>Gerando documento Word...</p>
         </div>
     </div>
 
@@ -371,9 +676,23 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            <label for="obra" class="form-label">Obra</label>
-                            <input type="text" class="form-control" id="obra" required>
+                            <label for="empresa" class="form-label">Empresa</label>
+                            <select class="form-select" id="empresa" required>
+                                <option value="">Selecione a empresa...</option>
+                            </select>
                         </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="obra" class="form-label">Obra</label>
+                            <select class="form-select" id="obra" required>
+                                <option value="">Primeiro selecione uma empresa...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="obraPc" class="form-label">Nº do Pedido (PC)</label>
+                            <input type="text" class="form-control" id="obraPc" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="data" class="form-label">Data</label>
                             <input type="date" class="form-control" id="data" required>
@@ -382,26 +701,42 @@
                             <label for="turno" class="form-label">Turno</label>
                             <select class="form-select" id="turno" required>
                                 <option value="">Selecione...</option>
-                                <option value="manha">Manhã (06:00 - 12:00)</option>
-                                <option value="tarde">Tarde (12:00 - 18:00)</option>
-                                <option value="noite">Noite (18:00 - 00:00)</option>
-                                <option value="integral">Integral (06:00 - 18:00)</option>
+                                <option value="manha">Manhã (07:30 - 12:00)</option>
+                                <option value="tarde">Tarde (12:00 - 17:18)</option>
+                                <option value="noite">Noite (19:00 - 00:00)</option>
+                                <option value="madrugada">Noite (01:00 - 04:48)</option>
+                                <option value="integral-dia">Integral Dia (07:30 - 17:18)</option>
+                                <option value="integral-noite">Integral Noite (19:00 - 04:48)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="encarregado" class="form-label">Encarregado</label>
+                            <select class="form-select" id="encarregado" required>
+                                <option value="">Selecione o encarregado...</option>
+                                <option value="CLEOMARCIO ALMEIDA DOS SANTOS">CLEOMARCIO ALMEIDA DOS SANTOS</option>
+                                <option value="GLECIO PEREIRA DE OLIVEIRA">GLECIO PEREIRA DE OLIVEIRA</option>
+                                <option value="JUAREZ RODRIGUES RIBEIRO">JUAREZ RODRIGUES RIBEIRO</option>
+                                <option value="MARCELO EDUARDO RAMPINELLI ROSA">MARCELO EDUARDO RAMPINELLI ROSA</option>
+                                <option value="MARCIO WESLEY FANCHIOTI">MARCIO WESLEY FANCHIOTI</option>
+                                <option value="ODIMAR PASSOS SOUZA">ODIMAR PASSOS SOUZA</option>
+                                <option value="RILDO DE MORAES SILVA">RILDO DE MORAES SILVA</option>
+                                <option value="VINICIUS DE JESUS SILVA">VINICIUS DE JESUS SILVA</option>
+                                <option value="WENDREO RAMOS DANTAS">WENDREO RAMOS DANTAS</option>
                             </select>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="encarregado" class="form-label">Encarregado</label>
-                            <input type="text" class="form-control" id="encarregado" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="empreiteira" class="form-label">Empreiteira</label>
-                            <input type="text" class="form-control" id="empreiteira">
+                        <div class="col-md-12 mb-3">
+                            <label for="area" class="form-label">Área/Unidade</label>
+                            <select class="form-select" id="area" required>
+                                <option value="">Primeiro selecione uma empresa...</option>
+                            </select>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Restante do formulário permanece igual -->
             <!-- Condições Climáticas -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -511,44 +846,6 @@
                 </div>
             </div>
 
-            <!-- Equipamentos e Materiais -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-tools me-2"></i>Equipamentos e Materiais
-                </div>
-                <div class="card-body">
-                    <div id="equipamentos-container">
-                        <div class="function-item">
-                            <div class="row">
-                                <div class="col-md-5 mb-3">
-                                    <label class="form-label">Equipamento/Material</label>
-                                    <input type="text" class="form-control" name="equipamento[]">
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Quantidade</label>
-                                    <input type="number" class="form-control" name="quantidade_equip[]">
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Status</label>
-                                    <select class="form-select" name="status_equip[]">
-                                        <option value="">Selecione...</option>
-                                        <option value="operante">Operante</option>
-                                        <option value="defeito">Com Defeito</option>
-                                        <option value="manutencao">Em Manutenção</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-sm btn-danger remove-item">
-                                <i class="fas fa-trash me-1"></i>Remover
-                            </button>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-secondary mt-2" id="add-equipamento">
-                        <i class="fas fa-plus me-1"></i>Adicionar Equipamento
-                    </button>
-                </div>
-            </div>
-
             <!-- Anexos de Fotos -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -584,10 +881,13 @@
         </form>
     </div>
 
+    <!-- Container para o PDF (inicialmente oculto) -->
+    <div id="pdf-container"></div>
+
     <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
-            <p>RDO Manager &copy; 2025 - Thaynison Couto</p>
+            <p>Relatório Diario &copy; 2025 - Thaynison Couto</p>
             <p class="small">Desenvolvido para gerenciamento e controle de atividades em serviços</p>
         </div>
     </footer>
@@ -595,9 +895,60 @@
     <!-- Bootstrap & jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- docx.js via CDN corrigido -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.min.js"></script>
     <script>
+        const empresasData = {
+            "empresas": [
+                {
+                    "nome": "Suzano Aracruz",
+                    "unidades": [
+                        "Pátio de Madeira",
+                        "Caldeira de Recuperação",
+                        "Caustificação",
+                        "Evaporação",
+                        "Estação de Tratamento Água",
+                        "Estação de Tratamento Esgoto",
+                        "Linha de Fibras",
+                        "Secagem",
+                        "Oficina Central"
+                    ],
+                    "obras": [
+                        { "nome": "PP LINHA 5", "pc": "4502169545" },
+                        { "nome": "TANQUE LBS", "pc": "4502224736" },
+                        { "nome": "PG SECAGEM B", "pc": "4502223947" },
+                        { "nome": "ATENDIMENTO AO BRANQUEAMENTO - LUCAS", "pc": "4502239784" },
+                        { "nome": "ATENDIMENTO AO BRANQUEAMENTO - GUILHERME", "pc": "4502239788" },
+                        { "nome": "FORNECIMENTO DE PLANEJADOR - FELIPE", "pc": "4502204259" }
+                    ]
+                },
+                {
+                    "nome": "Suzano Mucuri",
+                    "unidades": [
+                        "Pátio de Madeira",
+                        "Caldeira de Recuperação",
+                        "Caustificação",
+                        "Evaporação",
+                        "Estação de Tratamento Água",
+                        "Estação de Tratamento Esgoto",
+                        "Linha de Fibras",
+                        "Secagem",
+                        "Oficina Central"   
+                    ],
+                    "obras": [
+                        { "nome": "*", "pc": "*" }
+                    ]
+                },
+                {
+                    "nome": "CGH João Neiva",
+                    "unidades": [
+                        "CGH"
+                    ],
+                    "obras": [
+                        { "nome": "*", "pc": "*" },
+                    ]
+                }
+            ]
+        };
+        // Dados das empresas e obras
         $(document).ready(function() {
             // Inicializar toast
             const toastEl = document.getElementById('liveToast');
@@ -605,322 +956,13 @@
             
             // Função para mostrar loading
             function showLoading() {
-                $('#loadingOverlay').show();
             }
             
             // Função para esconder loading
             function hideLoading() {
-                $('#loadingOverlay').hide();
+                $('#loadingOverlay').remove();
             }
             
-            // Função para exportar para Word
-            function exportToWord(formData) {
-                return new Promise((resolve, reject) => {
-                    try {
-                        // Verificar se a biblioteca docx está carregada
-                        if (typeof docx === 'undefined') {
-                            reject("Erro: Biblioteca de exportação não carregada.");
-                            return;
-                        }
-                        
-                        const { Document, Paragraph, Table, TableRow, TableCell, HeadingLevel, AlignmentType, BorderStyle, WidthType, ShadingType } = docx;
-                        
-                        // Funções auxiliares para formatar os dados
-                        function formatClimaText(clima) {
-                            const climaTexts = {
-                                "ensolarado": "Ensolarado durante todo o dia",
-                                "nublado": "Nublado durante todo o dia",
-                                "chuvoso": "Chuvoso durante todo o dia",
-                                "tempestuoso": "Tempestuoso durante todo o dia"
-                            };
-                            return climaTexts[clima] || "Condições climáticas não especificadas";
-                        }
-
-                        function formatarData(data) {
-                            if (!data) return "Não informado";
-                            const [ano, mes, dia] = data.split('-');
-                            return `${dia}/${mes}/${ano}`;
-                        }
-
-                        function formatarTurno(turno) {
-                            const turnos = {
-                                "manha": "Manhã (06:00 - 12:00)",
-                                "tarde": "Tarde (12:00 - 18:00)",
-                                "noite": "Noite (18:00 - 00:00)",
-                                "integral": "Integral (06:00 - 18:00)"
-                            };
-                            return turnos[turno] || "Não informado";
-                        }
-
-                        function createTableFromObject(dataObj) {
-                            const rows = Object.entries(dataObj).map(([key, value]) => {
-                                return new TableRow({
-                                    children: [
-                                        new TableCell({
-                                            children: [new Paragraph({ text: key })],
-                                            shading: { fill: "D3D3D3", type: ShadingType.SOLID }
-                                        }),
-                                        new TableCell({
-                                            children: [new Paragraph({ text: value || "Não informado" })]
-                                        })
-                                    ]
-                                });
-                            });
-                            
-                            return new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    all: { style: BorderStyle.SINGLE, size: 1, color: "auto" }
-                                },
-                                rows: rows
-                            });
-                        }
-
-                        function createActivitiesList(activities) {
-                            if (!activities || activities.length === 0) {
-                                return [new Paragraph({ text: "Nenhuma atividade registrada.", spacing: { after: 200 } })];
-                            }
-                            
-                            return activities.map(activity => {
-                                return new Paragraph({
-                                    text: `• ${activity}`,
-                                    spacing: { after: 50 }
-                                });
-                            });
-                        }
-
-                        function createTeamTable(team) {
-                            if (!team || team.length === 0) {
-                                return new Paragraph({ text: "Nenhum membro da equipe registrado.", spacing: { after: 200 } });
-                            }
-                            
-                            const headerRow = new TableRow({
-                                children: [
-                                    new TableCell({
-                                        children: [new Paragraph({ text: "Nome" })],
-                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
-                                    }),
-                                    new TableCell({
-                                        children: [new Paragraph({ text: "Função" })],
-                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
-                                    }),
-                                    new TableCell({
-                                        children: [new Paragraph({ text: "Entrada" })],
-                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
-                                    }),
-                                    new TableCell({
-                                        children: [new Paragraph({ text: "Saída" })],
-                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
-                                    })
-                                ]
-                            });
-                            
-                            const teamRows = team.map(member => {
-                                return new TableRow({
-                                    children: [
-                                        new TableCell({
-                                            children: [new Paragraph({ text: member.nome || "Não informado" })]
-                                        }),
-                                        new TableCell({
-                                            children: [new Paragraph({ text: member.funcao || "Não informado" })]
-                                        }),
-                                        new TableCell({
-                                            children: [new Paragraph({ text: member.entrada || "Não informado" })]
-                                        }),
-                                        new TableCell({
-                                            children: [new Paragraph({ text: member.saida || "Não informado" })]
-                                        })
-                                    ]
-                                });
-                            });
-                            
-                            return new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    all: { style: BorderStyle.SINGLE, size: 1, color: "auto" }
-                                },
-                                rows: [headerRow, ...teamRows]
-                            });
-                        }
-
-                        function createEquipmentTable(equipment) {
-                            if (!equipment || equipment.length === 0) {
-                                return new Paragraph({ text: "Nenhum equipamento ou material registrado.", spacing: { after: 200 } });
-                            }
-                            
-                            const headerRow = new TableRow({
-                                children: [
-                                    new TableCell({
-                                        children: [new Paragraph({ text: "Equipamento/Material" })],
-                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
-                                    }),
-                                    new TableCell({
-                                        children: [new Paragraph({ text: "Quantidade" })],
-                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
-                                    }),
-                                    new TableCell({
-                                        children: [new Paragraph({ text: "Status" })],
-                                        shading: { fill: "D3D3D3", type: ShadingType.SOLID }
-                                    })
-                                ]
-                            });
-                            
-                            const equipmentRows = equipment.map(item => {
-                                function formatStatus(status) {
-                                    const statusTexts = {
-                                        "operante": "Operante",
-                                        "defeito": "Com Defeito",
-                                        "manutencao": "Em Manutenção"
-                                    };
-                                    return statusTexts[status] || "Não informado";
-                                }
-                                
-                                return new TableRow({
-                                    children: [
-                                        new TableCell({
-                                            children: [new Paragraph({ text: item.equipamento || "Não informado" })]
-                                        }),
-                                        new TableCell({
-                                            children: [new Paragraph({ text: item.quantidade || "Não informado" })]
-                                        }),
-                                        new TableCell({
-                                            children: [new Paragraph({ text: formatStatus(item.status) })]
-                                        })
-                                    ]
-                                });
-                            });
-                            
-                            return new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    all: { style: BorderStyle.SINGLE, size: 1, color: "auto" }
-                                },
-                                rows: [headerRow, ...equipmentRows]
-                            });
-                        }
-
-                        function createPhotosList(photos) {
-                            if (!photos || photos.length === 0) {
-                                return [new Paragraph({ text: "Nenhuma foto anexada.", spacing: { after: 200 } })];
-                            }
-                            
-                            return photos.map(photo => {
-                                return new Paragraph({
-                                    text: `• ${photo.nome}${photo.legenda ? ` - ${photo.legenda}` : ''}`,
-                                    spacing: { after: 50 }
-                                });
-                            });
-                        }
-
-                        // Criar um novo documento
-                        const doc = new Document({
-                            sections: [{
-                                properties: {},
-                                children: [
-                                    // Título do documento
-                                    new Paragraph({
-                                        text: "REGISTRO DIÁRIO DE OBRA - RDO",
-                                        heading: HeadingLevel.HEADING_1,
-                                        alignment: AlignmentType.CENTER,
-                                        spacing: { after: 400 }
-                                    }),
-                                    
-                                    // Dados Básicos
-                                    new Paragraph({
-                                        text: "DADOS BÁSICOS",
-                                        heading: HeadingLevel.HEADING_2,
-                                        spacing: { before: 400, after: 200 }
-                                    }),
-                                    createTableFromObject({
-                                        "Obra": formData.obra,
-                                        "Data": formatarData(formData.data),
-                                        "Turno": formatarTurno(formData.turno),
-                                        "Encarregado": formData.encarregado,
-                                        "Empreiteira": formData.empreiteira || "Não informado"
-                                    }),
-                                    
-                                    // Condições Climáticas
-                                    new Paragraph({
-                                        text: "CONDIÇÕES CLIMÁTICAS",
-                                        heading: HeadingLevel.HEADING_2,
-                                        spacing: { before: 400, after: 200 }
-                                    }),
-                                    new Paragraph({
-                                        text: formatClimaText(formData.clima),
-                                        spacing: { after: 400 }
-                                    }),
-                                    
-                                    // Atividades Realizadas
-                                    new Paragraph({
-                                        text: "ATIVIDADES REALIZADAS",
-                                        heading: HeadingLevel.HEADING_2,
-                                        spacing: { before: 400, after: 200 }
-                                    }),
-                                    ...createActivitiesList(formData.atividades),
-                                    
-                                    // Equipe
-                                    new Paragraph({
-                                        text: "EQUIPE",
-                                        heading: HeadingLevel.HEADING_2,
-                                        spacing: { before: 400, after: 200 }
-                                    }),
-                                    createTeamTable(formData.equipe),
-                                    
-                                    // Equipamentos e Materiais
-                                    new Paragraph({
-                                        text: "EQUIPAMENTOS E MATERIAIS",
-                                        heading: HeadingLevel.HEADING_2,
-                                        spacing: { before: 400, after: 200 }
-                                    }),
-                                    createEquipmentTable(formData.equipamentos),
-                                    
-                                    // Fotos (apenas legendas)
-                                    formData.fotos.length > 0 ? new Paragraph({
-                                        text: "FOTOS ANEXADAS",
-                                        heading: HeadingLevel.HEADING_2,
-                                        spacing: { before: 400, after: 200 }
-                                    }) : new Paragraph({}),
-                                    ...createPhotosList(formData.fotos),
-                                    
-                                    // Rodapé com data e hora de emissão
-                                    new Paragraph({
-                                        text: `Documento gerado em: ${new Date().toLocaleString('pt-BR')}`,
-                                        alignment: AlignmentType.RIGHT,
-                                        spacing: { before: 800 }
-                                    })
-                                ]
-                            }]
-                        });
-
-                        // Gerar o documento
-                        docx.Packer.toBlob(doc).then(blob => {
-                            // Criar URL para download
-                            const url = URL.createObjectURL(blob);
-                            const link = document.createElement("a");
-                            link.href = url;
-                            link.download = `RDO_${formData.obra}_${formData.data.replace(/-/g, '')}.docx`;
-                            document.body.appendChild(link);
-                            
-                            // Usar setTimeout para evitar problemas com extensões
-                            setTimeout(() => {
-                                link.click();
-                                setTimeout(() => {
-                                    document.body.removeChild(link);
-                                    URL.revokeObjectURL(url);
-                                    resolve();
-                                }, 100);
-                            }, 100);
-                        }).catch(error => {
-                            console.error("Erro ao gerar documento:", error);
-                            reject("Erro ao gerar documento Word.");
-                        });
-                    } catch (error) {
-                        console.error("Erro na exportação para Word:", error);
-                        reject("Erro ao exportar para Word.");
-                    }
-                });
-            }
-
             function showToast(message, type = 'success') {
                 $('.toast-body').text(message);
                 $('.toast').removeClass('bg-success bg-danger');
@@ -934,13 +976,83 @@
                 toast.show();
             }
 
+            // Preencher select de empresas
+            function populateEmpresas() {
+                const empresaSelect = $('#empresa');
+                empresaSelect.empty().append('<option value="">Selecione a empresa...</option>');
+                
+                empresasData.empresas.forEach(empresa => {
+                    empresaSelect.append($('<option>', {
+                        value: empresa.nome,
+                        text: empresa.nome
+                    }));
+                });
+            }
+            
+            // Preencher select de áreas baseado na empresa selecionada
+            function populateAreas(empresaNome) {
+                const areaSelect = $('#area');
+                areaSelect.empty().append('<option value="">Selecione a área...</option>');
+                
+                if (empresaNome) {
+                    const empresa = empresasData.empresas.find(e => e.nome === empresaNome);
+                    if (empresa && empresa.unidades) {
+                        empresa.unidades.forEach(unidade => {
+                            areaSelect.append($('<option>', {
+                                value: unidade,
+                                text: unidade
+                            }));
+                        });
+                    }
+                }
+            }
+            
+            // Preencher select de obras baseado na empresa selecionada
+            function populateObras(empresaNome) {
+                const obraSelect = $('#obra');
+                obraSelect.empty().append('<option value="">Selecione a obra...</option>');
+                $('#obraPc').val(''); // Limpar o campo do PC
+                
+                if (empresaNome) {
+                    const empresa = empresasData.empresas.find(e => e.nome === empresaNome);
+                    if (empresa && empresa.obras) {
+                        empresa.obras.forEach(obra => {
+                            obraSelect.append($('<option>', {
+                                value: obra.nome,
+                                text: obra.nome,
+                                'data-pc': obra.pc
+                            }));
+                        });
+                    }
+                }
+            }
+            
+            // Evento quando a empresa é alterada
+            $('#empresa').change(function() {
+                const empresaSelecionada = $(this).val();
+                populateAreas(empresaSelecionada);
+                populateObras(empresaSelecionada);
+                updateProgress();
+            });
+            
+            // Evento quando a obra é alterada
+            $('#obra').change(function() {
+                const obraSelecionada = $(this).find('option:selected');
+                const pcValue = obraSelecionada.data('pc') || '';
+                $('#obraPc').val(pcValue);
+                updateProgress();
+            });
+
             // Definir data atual como padrão
             const today = new Date().toISOString().split('T')[0];
             $("#data").val(today);
             
+            // Preencher empresas ao carregar a página
+            populateEmpresas();
+            
             // Atualizar barra de progresso
             function updateProgress() {
-                const totalFields = 15; // Aproximação de campos importantes
+                const totalFields = 17; // Aumentado para incluir o campo de PC
                 let filledFields = 0;
                 
                 // Verificar campos obrigatórios
@@ -1031,36 +1143,6 @@
                 `);
             });
 
-            // Adicionar novo equipamento
-            $("#add-equipamento").click(function() {
-                $("#equipamentos-container").append(`
-                    <div class="function-item">
-                        <div class="row">
-                            <div class="col-md-5 mb-3">
-                                <label class="form-label">Equipamento/Material</label>
-                                <input type="text" class="form-control" name="equipamento[]">
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Quantidade</label>
-                                <input type="number" class="form-control" name="quantidade_equip[]">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" name="status_equip[]">
-                                    <option value="">Selecione...</option>
-                                    <option value="operante">Operante</option>
-                                    <option value="defeito">Com Defeito</option>
-                                    <option value="manutencao">Em Manutenção</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-danger remove-item">
-                            <i class="fas fa-trash me-1"></i>Remover
-                        </button>
-                    </div>
-                `);
-            });
-
             // Adicionar mais fotos
             $("#add-foto").click(function() {
                 $("#fotos-container").append(`
@@ -1105,7 +1187,7 @@
                     $("#rdoForm")[0].reset();
                     $(".image-preview").html('<span class="text-muted">Pré-visualização da imagem</span>');
                     $(".clima-option").removeClass("selected");
-                    $("#atividades-container, #equipe-container, #equipamentos-container").html(`
+                    $("#atividades-container, #equipe-container").html(`
                         <div class="function-item">
                             <div class="mb-3">
                                 <label class="form-label">Descrição da Atividade</label>
@@ -1127,25 +1209,246 @@
                             </div>
                         </div>
                     `);
+                    populateEmpresas(); // Resetar empresas
                     updateProgress();
                     showToast("Formulário limpo com sucesso!", "success");
                 }
             });
 
-            // Enviar formulário
+            // Função para gerar o PDF
+            async function generatePDF(formData) {
+                console.log("Iniciando geração do PDF...");
+                console.log("Dados coletados:", formData);
+                
+                // Mostrar loading
+                showLoading();
+                
+                try {
+                    // Construir o conteúdo do PDF
+                    let pdfContent = `
+                        <div class="pdf-content">
+                            <div class="pdf-header">
+                                <div class="pdf-logo">
+                                    <h1>RELATÓRIO DIÁRIO DE OBRA</h1>
+                                </div>
+                            </div>
+                            
+                            <div class="pdf-info-box">
+                                <div class="pdf-info-row">
+                                    <div class="pdf-info-item">
+                                        <div class="pdf-info-label">Empresa</div>
+                                        <div>${formData.empresa || 'Não informado'}</div>
+                                    </div>
+                                    <div class="pdf-info-item">
+                                        <div class="pdf-info-label">Obra</div>
+                                        <div>${formData.obra}</div>
+                                    </div>
+                                    <div class="pdf-info-item">
+                                        <div class="pdf-info-label">Nº do Pedido (PC)</div>
+                                        <div>${$("#obraPc").val() || 'Não informado'}</div>
+                                    </div>
+                                </div>
+                                <div class="pdf-info-row">
+                                    <div class="pdf-info-item">
+                                        <div class="pdf-info-label">Data</div>
+                                        <div>${new Date(formData.data).toLocaleDateString('pt-BR')}</div>
+                                    </div>
+                                    <div class="pdf-info-item">
+                                        <div class="pdf-info-label">Turno</div>
+                                        <div>${$("#turno option:selected").text()}</div>
+                                    </div>
+                                    <div class="pdf-info-item">
+                                        <div class="pdf-info-label">Encarregado</div>
+                                        <div>${formData.encarregado}</div>
+                                    </div>
+                                </div>
+                                <div class="pdf-info-row">
+                                    <div class="pdf-info-item">
+                                        <div class="pdf-info-label">Área/Unidade</div>
+                                        <div>${formData.area || 'Não informado'}</div>
+                                    </div>
+                                    <div class="pdf-info-item">
+                                        <div class="pdf-info-label">Condições Climáticas</div>
+                                        <div>${getClimaDescription(formData.clima)}</div>
+                                    </div>
+                                    <div class="pdf-info-item">
+                                        <div class="pdf-info-label">Data de Emissão</div>
+                                        <div>${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</div>
+                                    </div>
+                                </div>
+                            </div>
+                    `;
+                    
+                    // Adicionar atividades
+                    if (formData.atividades && formData.atividades.length > 0) {
+                        pdfContent += `
+                            <div class="pdf-section avoid-break">
+                                <div class="pdf-section-title">Atividades Realizadas</div>
+                                <ol>
+                        `;
+                        
+                        formData.atividades.forEach(atividade => {
+                            pdfContent += `<li>${atividade}</li>`;
+                        });
+                        
+                        pdfContent += `
+                                </ol>
+                            </div>
+                        `;
+                    }
+                    
+                    // Adicionar equipe
+                    if (formData.equipe && formData.equipe.length > 0) {
+                        pdfContent += `
+                            <div class="pdf-section avoid-break">
+                                <div class="pdf-section-title">Equipe</div>
+                                <table class="pdf-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Função</th>
+                                            <th>Entrada</th>
+                                            <th>Saída</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+                        
+                        formData.equipe.forEach(membro => {
+                            pdfContent += `
+                                <tr>
+                                    <td>${membro.nome || ''}</td>
+                                    <td>${membro.funcao || ''}</td>
+                                    <td>${membro.entrada || ''}</td>
+                                    <td>${membro.saida || ''}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        pdfContent += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                    }
+                    
+                    // Adicionar fotos (processamento assíncrono)
+                    if (formData.fotos && formData.fotos.length > 0) {
+                        pdfContent += `
+                            <div class="pdf-section avoid-break">
+                                <div class="pdf-section-title">Anexos de Fotos</div>
+                                <div class="pdf-images-grid">
+                        `;
+                        
+                        // Processar cada foto
+                        for (let i = 0; i < formData.fotos.length; i++) {
+                            const foto = formData.fotos[i];
+                            if (foto.dataUrl) {
+                                pdfContent += `
+                                    <div class="pdf-image-wrapper">
+                                        <div class="pdf-image-box">
+                                            <img src="${foto.dataUrl}" alt="Foto ${i+1}">
+                                        </div>
+                                        <div class="pdf-image-caption">${foto.legenda || `Foto ${i+1}`}</div>
+                                    </div>
+                                `;
+                            }
+                        }
+                        
+                        pdfContent += `
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    pdfContent += `</div>`; // Fechar div.pdf-content
+                    
+                    // Adicionar seção de assinaturas
+                    pdfContent += `
+                        <div class="signature-section avoid-break">
+                            <div class="signature-grid">
+                                <div class="signature-box">
+                                    <div class="signature-line"></div>
+                                    <div class="signature-name">Encarregado</div>
+                                    <div class="signature-role">Responsável pela obra</div>
+                                </div>
+                                <div class="signature-box">
+                                    <div class="signature-line"></div>
+                                    <div class="signature-name">Planejador</div>
+                                    <div class="signature-role">Responsável pelo planejamento</div>
+                                </div>
+                                <div class="signature-box">
+                                    <div class="signature-line"></div>
+                                    <div class="signature-name">Supervisor</div>
+                                    <div class="signature-role">Responsável pela supervisão</div>
+                                </div>
+                                <div class="signature-box">
+                                    <div class="signature-line"></div>
+                                    <div class="signature-name">Resp. Contratante</div>
+                                    <div class="signature-role">Responsável pelo contratante</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pdf-footer">
+                            Relatório Diario &copy; 2025
+                        </div>
+                    `;
+                    
+                    // Inserir o conteúdo no container do PDF
+                    $("#pdf-container").html(pdfContent);
+                    console.log("Conteúdo do PDF gerado com sucesso");
+                    
+                    // Aguardar um momento para garantir que as imagens são carregadas
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Acionar a impressão
+                    window.print();
+                    
+                    // Esconder loading após um breve delay
+                    setTimeout(() => {
+                        hideLoading();
+                        showToast("PDF gerado com sucesso! Use a opção 'Salvar como PDF' na janela de impressão.", "success");
+                        console.log("PDF pronto para impressão/salvamento");
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error("Erro ao gerar PDF:", error);
+                    hideLoading();
+                    showToast("Erro ao gerar PDF. Verifique o console para detalhes.", "error");
+                }
+            }
+            
+            // Função auxiliar para obter descrição do clima
+            function getClimaDescription(clima) {
+                const climas = {
+                    'ensolarado': 'Ensolarado',
+                    'nublado': 'Nublado',
+                    'chuvoso': 'Chuvoso',
+                    'tempestuoso': 'Tempestuoso'
+                };
+                return climas[clima] || 'Não especificado';
+            }
+            
+            // Função para ler arquivo como Data URL (base64)
+            function readFileAsDataURL(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            // Processar envio do formulário
             $("#rdoForm").submit(async function(e) {
                 e.preventDefault();
+                console.log("Formulário submetido. Iniciando coleta de dados...");
                 
                 // Validar formulário
                 if (!this.checkValidity()) {
                     this.reportValidity();
-                    showToast("Por favor, preencha todos os campos obrigatórios.", "error");
-                    return;
-                }
-                
-                // Verificar se condições climáticas foram selecionadas
-                if (!$("#clima").val()) {
-                    showToast("Por favor, selecione as condições climáticas.", "error");
+                    showToast("Preencha todos os campos obrigatórios!", "error");
                     return;
                 }
                 
@@ -1155,31 +1458,31 @@
                     data: $("#data").val(),
                     turno: $("#turno").val(),
                     encarregado: $("#encarregado").val(),
-                    empreiteira: $("#empreiteira").val(),
+                    empresa: $("#empresa").val(),
+                    area: $("#area").val(),
                     clima: $("#clima").val(),
                     atividades: [],
                     equipe: [],
-                    equipamentos: [],
                     fotos: []
                 };
                 
                 // Coletar atividades
                 $("textarea[name='atividade[]']").each(function() {
                     if ($(this).val().trim() !== '') {
-                        formData.atividades.push($(this).val());
+                        formData.atividades.push($(this).val().trim());
                     }
                 });
                 
                 // Coletar equipe
                 $(".function-item", "#equipe-container").each(function() {
-                    const nome = $(this).find("input[name='funcionario[]']").val();
-                    const funcao = $(this).find("select[name='funcao[]']").val();
-                    const entrada = $(this).find("input[name='entrada[]']").val();
-                    const saida = $(this).find("input[name='saida[]']").val();
+                    const nome = $("input[name='funcionario[]']", this).val();
+                    const funcao = $("select[name='funcao[]']", this).val();
+                    const entrada = $("input[name='entrada[]']", this).val();
+                    const saida = $("input[name='saida[]']", this).val();
                     
-                    if (nome || funcao || entrada || saida) {
+                    if (nome) {
                         formData.equipe.push({
-                            nome: nome,
+                            nome: nome.trim(),
                             funcao: funcao,
                             entrada: entrada,
                             saida: saida
@@ -1187,53 +1490,36 @@
                     }
                 });
                 
-                // Coletar equipamentos
-                $(".function-item", "#equipamentos-container").each(function() {
-                    const equipamento = $(this).find("input[name='equipamento[]']").val();
-                    const quantidade = $(this).find("input[name='quantidade_equip[]']").val();
-                    const status = $(this).find("select[name='status_equip[]']").val();
-                    
-                    if (equipamento || quantidade || status) {
-                        formData.equipamentos.push({
-                            equipamento: equipamento,
-                            quantidade: quantidade,
-                            status: status
-                        });
-                    }
-                });
+                // Coletar fotos (processamento assíncrono)
+                const fotoInputs = $(".foto-input");
+                console.log(`Encontradas ${fotoInputs.length} entradas de foto`);
                 
-                // Coletar informações das fotos (apenas nomes e legendas)
-                $(".foto-input").each(function(index) {
-                    const file = this.files[0];
-                    const legenda = $(this).siblings(".mt-2").find(".foto-legenda").val();
+                for (let i = 0; i < fotoInputs.length; i++) {
+                    const input = fotoInputs[i];
+                    const file = input.files[0];
                     
                     if (file) {
-                        formData.fotos.push({
-                            nome: file.name,
-                            legenda: legenda
-                        });
+                        try {
+                            console.log(`Processando foto ${i+1}: ${file.name}`);
+                            const dataUrl = await readFileAsDataURL(file);
+                            const legenda = $(input).siblings('.mt-2').find('.foto-legenda').val();
+                            
+                            formData.fotos.push({
+                                dataUrl: dataUrl,
+                                legenda: legenda
+                            });
+                            
+                            console.log(`Foto ${i+1} processada com sucesso`);
+                        } catch (error) {
+                            console.error(`Erro ao processar foto ${i+1}:`, error);
+                        }
                     }
-                });
-                
-                // Mostrar loading
-                showLoading();
-                
-                try {
-                    // Exportar para Word
-                    await exportToWord(formData);
-                    
-                    // Salvar no localStorage (apenas para demonstração)
-                    const timestamp = new Date().getTime();
-                    localStorage.setItem(`rdo_${timestamp}`, JSON.stringify(formData));
-                    
-                    showToast("RDO salvo com sucesso! Download do documento iniciado.", "success");
-                } catch (error) {
-                    console.error("Erro ao exportar:", error);
-                    showToast(error, "error");
-                } finally {
-                    // Esconder loading
-                    hideLoading();
                 }
+                
+                console.log("Todos os dados coletados. Iniciando geração do PDF...");
+                
+                // Gerar PDF
+                await generatePDF(formData);
             });
         });
     </script>
