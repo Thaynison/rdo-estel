@@ -437,7 +437,7 @@
             padding-top: 10px;
         }
 
-        /* MELHORIAS NO CSS DE IMPRESSÃO */
+        /* CORREÇÕES PARA A IMPRESSÃO DO PDF */
         @media print {
             body, html {
                 width: 100% !important;
@@ -543,13 +543,14 @@
                 font-size: 8pt !important;
             }
             
+            /* CORREÇÃO: Remover position:fixed das assinaturas e rodapé */
             .signature-section {
-                position: fixed;
-                bottom: 0.8in;
-                left: 0.2in;
-                right: 0.2in;
-                margin-top: 0.2in !important;
+                margin-top: 0.5in !important;
                 page-break-inside: avoid !important;
+                position: relative !important;
+                bottom: auto !important;
+                left: auto !important;
+                right: auto !important;
             }
             
             .signature-title {
@@ -571,15 +572,17 @@
                 font-size: 8pt !important;
             }
             
+            /* CORREÇÃO: Alterar position do footer para relative */
             .pdf-footer {
-                position: fixed;
-                bottom: 0.2in;
-                left: 0.2in;
-                right: 0.2in;
-                margin-top: 0.2in !important;
+                margin-top: 0.5in !important;
                 font-size: 9pt !important;
                 padding-top: 0.05in !important;
                 border-top: 1px solid #ddd !important;
+                position: relative !important;
+                bottom: auto !important;
+                left: auto !important;
+                right: auto !important;
+                text-align: center !important;
             }
             
             /* Garantir que não haja quebras desnecessárias */
@@ -597,9 +600,23 @@
                 margin-bottom: 0.05in !important;
             }
 
-            /* Adicionar margem inferior ao conteúdo principal para evitar sobreposição */
+            /* Remover margem inferior do conteúdo principal */
             .pdf-content {
-                margin-bottom: 2in !important;
+                margin-bottom: 0.5in !important;
+            }
+            
+            /* CORREÇÃO: Centralizar assinaturas */
+            .signature-grid {
+                display: flex !important;
+                justify-content: space-around !important;
+                flex-wrap: wrap !important;
+            }
+            
+            .signature-box {
+                width: 23% !important;
+                min-width: 150px !important;
+                margin-bottom: 20px !important;
+                text-align: center !important;
             }
         }
 
