@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
   <title>RDO – Nova Interface V2</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
@@ -29,10 +29,8 @@
     .panel{background:var(--paper);border-radius:1rem;box-shadow:0 6px 20px rgba(15,23,42,.06);padding:1rem;margin-bottom:1.1rem}
     .panel h5{margin:0 0 .8rem;color:#111827;font-weight:700}
     .muted{color:var(--muted)}
-
     .progress-lite{height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden}
     .progress-lite .bar{height:100%;width:0;background:var(--accent)}
-
     .chip{background:#f1f5f9;border:1px dashed #e2e8f0;border-radius:.75rem;padding:.85rem}
 
     .clima-grid{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:.7rem}
@@ -48,10 +46,10 @@
 
     footer{position:fixed;left:0;right:0;bottom:0;background:var(--brand-700);color:#e5e7eb;padding:.65rem}
 
-    /* PRINT / PDF */
+    /* ===================== PRINT / PDF ===================== */
     #pdf-container{display:none;font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
     .pdf-header{display:flex;gap:16px;align-items:center;border-bottom:2px solid #002060;padding-bottom:8px;margin-bottom:10px}
-    .pdf-header img{max-height:64px}
     .pdf-h-title{color:#002060;font-size:20px;font-weight:700;margin:0}
 
     .pdf-info{border:1px solid #ddd;border-radius:6px;padding:10px;margin:10px 0;background:#fafafa}
@@ -60,16 +58,16 @@
     .pdf-label{font-weight:700;color:#002060}
 
     .pdf-section{margin:10px 0}
-    .pdf-section-title{background:#002060;color:#fff;padding:6px;border-radius:4px;font-weight:700}
+    .pdf-section-title{display:block;width:100%;box-sizing:border-box;background:#002060;color:#fff;padding:6px;border-radius:4px;font-weight:700}
     .pdf-table{width:100%;border-collapse:collapse}
     .pdf-table th,.pdf-table td{border:1px solid #ddd;padding:6px;text-align:left}
+
     .pdf-imggrid{display:flex;flex-wrap:wrap;gap:12px}
     .pdf-imgwrap{flex:1 1 30%;max-width:33%}
-    .pdf-imgbox{height:180px;border:1px solid #ddd;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .pdf-imgbox{min-height:180px;border:1px solid #ddd;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
     .pdf-imgbox img{max-width:100%;max-height:100%;object-fit:contain}
     .pdf-caption{text-align:center;font-style:italic;font-size:.9em;margin-top:4px}
 
-    .signature-section{margin-top:16px}
     .signature-title{text-align:center;font-weight:700;color:#002060;border-top:1px solid #ddd;padding-top:8px;margin-bottom:6px}
     .signature-grid{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
     .signature-box{width:23%;min-width:150px;text-align:center}
@@ -77,36 +75,34 @@
     .signature-name{font-weight:700}
     .signature-role{font-size:.9em;color:#555}
 
-    .pdf-footer{margin-top:10px;color:#666;text-align:center;font-size:11px;border-top:1px solid #ddd;padding-top:8px}
-
     @media print{
-      /* Reserva espaço para o rodapé de assinatura em TODAS as páginas */
-      @page{ size: A4 portrait; margin: 12mm 10mm 36mm 10mm; }
+      /* reserva espaço de margem, o rodapé repete via table-footer-group */
+      @page{ size: A4 portrait; margin: 12mm 10mm 18mm 10mm; }
 
       body,html{margin:0;padding:0;background:#fff;color:#000}
       .app,.topbar,.sidebar,.fab,footer{display:none !important}
+
+      /* mostra somente o contêiner do PDF */
       #pdf-container{display:block !important;padding:0;margin:0;font-size:10pt}
 
-      /* Cabeçalho e elementos que não podem quebrar no meio */
+      /* cabeçalhos e linhas não quebram no meio */
       .pdf-header{page-break-inside:avoid}
       .avoid-break{break-inside:avoid}
       .pdf-imgwrap{break-inside:avoid}
       .page-break{break-before:page}
 
-      /* Tabelas: repete o cabeçalho e evita quebrar linhas ao meio */
       .pdf-table thead{display:table-header-group}
       .pdf-table tr{page-break-inside:avoid;break-inside:avoid}
 
-      /* Rodapé de assinaturas fixo em todas as páginas */
-      .signature-section{
-        position:fixed;left:0;right:0;bottom:0;height:36mm;background:#fff
-      }
-      .signature-grid{padding:0 10mm}
-      /* não precisamos mais "empurrar" o conteúdo para cima em cada página */
-      .pdf-content{margin:0}
+      /* nova estratégia cross-browser para rodapé fixo em todas as páginas */
+      .pdf-doc{display:table;width:100%}
+      .pdf-body{display:table-row-group}
+      .pdf-footer-fixed{display:table-footer-group}
+      /* anula qualquer posicionamento fixo */
+      .pdf-footer-fixed .signature-section{position:static;height:auto;margin:0}
     }
 
-    /* RESPONSIVO */
+    /* ===================== RESPONSIVO APP ===================== */
     @media (max-width: 991px){
       .app{grid-template-columns:1fr}
       .sidebar{position:relative;height:auto}
@@ -123,22 +119,21 @@
       .chip{padding:.75rem}
       .thumb{height:140px}
     }
-  
-/* Sidebar off-canvas mobile */
-body.sidebar-open{overflow:hidden}
-.sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1030;display:none;opacity:0;transition:opacity .2s ease}
-.sidebar-backdrop.show{display:block;opacity:1}
-@media (max-width: 991px){
-  .app{grid-template-columns:1fr}
-  .sidebar{
-    position:fixed;left:0;top:0;bottom:0;width:280px;height:100vh;
-    z-index:1040;transform:translateX(-100%);transition:transform .25s ease;
-    box-shadow:0 10px 24px rgba(0,0,0,.25)
-  }
-  .sidebar.open{transform:translateX(0)}
-  .topbar{align-items:center}
-}
 
+    /* Sidebar off-canvas mobile */
+    body.sidebar-open{overflow:hidden}
+    .sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1030;display:none;opacity:0;transition:opacity .2s ease}
+    .sidebar-backdrop.show{display:block;opacity:1}
+    @media (max-width: 991px){
+      .app{grid-template-columns:1fr}
+      .sidebar{
+        position:fixed;left:0;top:0;bottom:0;width:280px;height:100vh;
+        z-index:1040;transform:translateX(-100%);transition:transform .25s ease;
+        box-shadow:0 10px 24px rgba(0,0,0,.25)
+      }
+      .sidebar.open{transform:translateX(0)}
+      .topbar{align-items:center}
+    }
   </style>
 </head>
 <body>
@@ -339,7 +334,7 @@ body.sidebar-open{overflow:hidden}
         <section class="tab-pane fade" id="step-revisao" role="tabpanel">
           <div class="panel">
             <h5>Revisão rápida</h5>
-            <p class="muted">Use os botões flutuantes para visualizar/imprimir. A assinatura sai fixa no rodapé de todas as páginas do PDF.</p>
+            <p class="muted">Use os botões flutuantes para visualizar/imprimir. A assinatura sai no rodapé de todas as páginas.</p>
             <div id="resumo" class="small"></div>
           </div>
         </section>
@@ -355,8 +350,10 @@ body.sidebar-open{overflow:hidden}
 
   <footer class="text-center small">RDO &copy; 2025 – Thaynison Couto</footer>
 
+  <!-- contêiner usado somente para impressão -->
   <div id="pdf-container"></div>
 
+  <!-- modal limpar -->
   <div class="modal fade" id="confirmClearModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -372,6 +369,7 @@ body.sidebar-open{overflow:hidden}
     </div>
   </div>
 
+  <!-- toast -->
   <div class="position-fixed top-0 end-0 p-3" style="z-index:1080">
     <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-header">
@@ -386,6 +384,7 @@ body.sidebar-open{overflow:hidden}
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    /* ===================== DADOS E HELPERS ===================== */
     const empresasData = { empresas:[ { nome:"Suzano Aracruz", unidades:["Pátio de Madeira","Caldeira de Recuperação","Caustificação","Evaporação","Estação de Tratamento Água","Estação de Tratamento Esgoto","Linha de Fibras","Secagem","Oficina Central"], obras:[ {nome:"PP LINHA 4", pc:"4502169545"}, {nome:"PP LINHA 5", pc:"4502169545"}, {nome:"TANQUE LBS", pc:"4502224736"}, {nome:"PG SECAGEM B", pc:"4502223947"}, {nome:"ATENDIMENTO AO BRANQUEAMENTO - LUCAS", pc:"4502239784"}, {nome:"ATENDIMENTO AO BRANQUEAMENTO - GUILHERME", pc:"4502239788"}, {nome:"FORNECIMENTO DE PLANEJADOR - FELIPE", pc:"4502204259"} ] }, { nome:"Suzano Mucuri", unidades:["Pátio de Madeira","Caldeira de Recuperação","Caustificação","Evaporação","Estação de Tratamento Água","Estação de Tratamento Esgoto","Linha de Fibras","Secagem","Oficina Central"], obras:[{nome:"*", pc:"*"}] }, { nome:"CGH João Neiva", unidades:["CGH"], obras:[{nome:"*", pc:"*"}] } ] };
 
     const toast = new bootstrap.Toast(document.getElementById('liveToast'), {delay:3000});
@@ -402,109 +401,123 @@ body.sidebar-open{overflow:hidden}
     function updateProgress(){ const requiredIds = ['empresa','obra','data','turno','encarregado','area','clima']; const filled = requiredIds.filter(id=>$('#'+id).val()).length; const pct = Math.round((filled/requiredIds.length)*100); $('#progressBar').css('width', pct+'%').css('background', pct<30?'#ef4444':(pct<70?'#f59e0b':'#16a34a')); }
     function getClimaDescription(val){ const map={ensolarado:'Ensolarado',nublado:'Nublado',chuvoso:'Chuvoso',tempestuoso:'Tempestuoso'}; return map[val]||'Não especificado'; }
     function readFileAsDataURL(file){ return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);}); }
-    function collectFormData(){ const formData={ obra:$('#obra').val(), data:$('#data').val(), turno:$('#turno').val(), encarregado:$('#encarregado').val(), empresa:$('#empresa').val(), area:$('#area').val(), clima:$('#clima').val(), atividades:[], observacoes:$('#observacoes').val(), equipe:[], fotos:[]}; $("textarea[name='atividade[]']").each(function(){const v=$(this).val().trim(); if(v) formData.atividades.push(v);}); $('#equipe-container .chip').each(function(){ const nome=$(this).find("input[name='funcionario[]']").val(); const funcao=$(this).find("select[name='funcao[]']").val(); const entrada=$(this).find("input[name='entrada[]']").val(); const saida=$(this).find("input[name='saida[]']").val(); if(nome) formData.equipe.push({nome:nome.trim(),funcao,entrada,saida}); }); return formData; }
-
-    // Heurística simples para inserir quebras de página entre seções longas
-    function maybePageBreakAfterActivities(len){
-      return len >= 18 ? '<div class="page-break"></div>' : '';
+    function collectFormData(){
+      const formData={
+        obra:$('#obra').val(), data:$('#data').val(), turno:$('#turno').val(),
+        encarregado:$('#encarregado').val(), empresa:$('#empresa').val(),
+        area:$('#area').val(), clima:$('#clima').val(), atividades:[],
+        observacoes:$('#observacoes').val(), equipe:[]
+      };
+      $("textarea[name='atividade[]']").each(function(){const v=$(this).val().trim(); if(v) formData.atividades.push(v);});
+      $('#equipe-container .chip').each(function(){
+        const nome=$(this).find("input[name='funcionario[]']").val();
+        const funcao=$(this).find("select[name='funcao[]']").val();
+        const entrada=$(this).find("input[name='entrada[]']").val();
+        const saida=$(this).find("input[name='saida[]']").val();
+        if(nome) formData.equipe.push({nome:nome.trim(),funcao,entrada,saida});
+      });
+      return formData;
     }
-    function maybePageBreakBeforePhotos(teamLen, fotoLen){
-      return (teamLen >= 12 || fotoLen > 6) ? '<div class="page-break"></div>' : '';
-    }
 
+    // heurísticas de quebra
+    function maybePageBreakAfterActivities(len){ return len >= 18 ? '<div class="page-break"></div>' : ''; }
+    function maybePageBreakBeforePhotos(teamLen, fotoLen){ return (teamLen >= 12 || fotoLen > 6) ? '<div class="page-break"></div>' : ''; }
+
+    /* ===================== GERAÇÃO DO PDF ===================== */
     async function generatePDF(formData, isPreview=false){
-      let pdf = '';
-      pdf += `<div class="pdf-content">`;
-      pdf += `  <div class="pdf-header">`+
-             `    <div><h1 class="pdf-h-title">Registro Diário de Obra - RDO</h1><div>Documento de registro das atividades</div></div>`+
-             `  </div>`;
+      // prepara fotos
+      const photos = window.__photos||[];
+      const photoCount = photos.length;
 
-      pdf += `<div class="pdf-info">`+
-             `  <div class="pdf-grid">`+
-             `    <div class="pdf-col"><div class="pdf-label">Cliente</div><div>${formData.empresa||'Não informado'}</div></div>`+
-             `    <div class="pdf-col"><div class="pdf-label">Serviço</div><div>${formData.obra||'Não informado'}</div></div>`+
-             `    <div class="pdf-col"><div class="pdf-label">Nº do Pedido (PC)</div><div>${$('#obraPc').val()||'Não informado'}</div></div>`+
-             `  </div>`+
-             `  <div class="pdf-grid">`+
-             `    <div class="pdf-col"><div class="pdf-label">Data</div><div>${formData.data?formData.data.split('-').reverse().join('/'):'Não informado'}</div></div>`+
-             `    <div class="pdf-col"><div class="pdf-label">Turno</div><div>${$('#turno option:selected').text()||'Não informado'}</div></div>`+
-             `    <div class="pdf-col"><div class="pdf-label">Encarregado</div><div>${formData.encarregado||'Não informado'}</div></div>`+
-             `  </div>`+
-             `  <div class="pdf-grid">`+
-             `    <div class="pdf-col"><div class="pdf-label">Área/Unidade</div><div>${formData.area||'Não informado'}</div></div>`+
-             `    <div class="pdf-col"><div class="pdf-label">Condições Climáticas</div><div>${getClimaDescription(formData.clima)}</div></div>`+
-             `    <div class="pdf-col"><div class="pdf-label">Emissão</div><div>${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}</div></div>`+
-             `  </div>`+
-             `</div>`;
+      let bodyHtml = '';
+      bodyHtml += `  <div class="pdf-header">`+
+                  `    <div><h1 class="pdf-h-title">Registro Diário de Obra - RDO</h1><div>Documento de registro das atividades</div></div>`+
+                  `  </div>`;
 
-      // Atividades
+      bodyHtml += `<div class="pdf-info">`+
+                  `  <div class="pdf-grid">`+
+                  `    <div class="pdf-col"><div class="pdf-label">Cliente</div><div>${formData.empresa||'Não informado'}</div></div>`+
+                  `    <div class="pdf-col"><div class="pdf-label">Serviço</div><div>${formData.obra||'Não informado'}</div></div>`+
+                  `    <div class="pdf-col"><div class="pdf-label">Nº do Pedido (PC)</div><div>${$('#obraPc').val()||'Não informado'}</div></div>`+
+                  `  </div>`+
+                  `  <div class="pdf-grid">`+
+                  `    <div class="pdf-col"><div class="pdf-label">Data</div><div>${formData.data?formData.data.split('-').reverse().join('/'):'Não informado'}</div></div>`+
+                  `    <div class="pdf-col"><div class="pdf-label">Turno</div><div>${$('#turno option:selected').text()||'Não informado'}</div></div>`+
+                  `    <div class="pdf-col"><div class="pdf-label">Encarregado</div><div>${formData.encarregado||'Não informado'}</div></div>`+
+                  `  </div>`+
+                  `  <div class="pdf-grid">`+
+                  `    <div class="pdf-col"><div class="pdf-label">Área/Unidade</div><div>${formData.area||'Não informado'}</div></div>`+
+                  `    <div class="pdf-col"><div class="pdf-label">Condições Climáticas</div><div>${getClimaDescription(formData.clima)}</div></div>`+
+                  `    <div class="pdf-col"><div class="pdf-label">Emissão</div><div>${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}</div></div>`+
+                  `  </div>`+
+                  `</div>`;
+
       if(formData.atividades?.length){
-        pdf += `<div class="pdf-section avoid-break"><div class="pdf-section-title">Atividades Realizadas</div><ol>`;
-        formData.atividades.forEach(a=>pdf += `<li>${a}</li>`);
-        pdf += `</ol></div>`;
-        pdf += maybePageBreakAfterActivities(formData.atividades.length);
+        bodyHtml += `<div class="pdf-section avoid-break"><div class="pdf-section-title">Atividades Realizadas</div><ol>`;
+        formData.atividades.forEach(a=>bodyHtml += `<li>${a}</li>`);
+        bodyHtml += `</ol></div>`;
+        bodyHtml += maybePageBreakAfterActivities(formData.atividades.length);
       } else if(isPreview){
-        pdf += `<div class="pdf-section avoid-break"><div class="pdf-section-title">Atividades Realizadas</div><p><em>Exemplo de visualização</em></p><ol><li>Instalação de tubulação</li><li>Manutenção preventiva</li><li>Substituição de válvulas</li></ol></div>`;
+        bodyHtml += `<div class="pdf-section avoid-break"><div class="pdf-section-title">Atividades Realizadas</div><p><em>Exemplo de visualização</em></p><ol><li>Instalação de tubulação</li><li>Manutenção preventiva</li><li>Substituição de válvulas</li></ol></div>`;
       }
 
       if(formData.observacoes && formData.observacoes.trim()){
-        pdf += `<div class="pdf-section avoid-break"><div class="pdf-section-title">Observações</div><p>${formData.observacoes}</p></div>`;
+        bodyHtml += `<div class="pdf-section avoid-break"><div class="pdf-section-title">Observações</div><p>${formData.observacoes}</p></div>`;
       }
 
-      // Equipe
       if(formData.equipe?.length){
-        pdf += `<div class="pdf-section"><div class="pdf-section-title">Equipe</div>`+
-               `<table class="pdf-table"><thead><tr><th>Nome</th><th>Função</th><th>Entrada</th><th>Saída</th></tr></thead><tbody>`;
-        formData.equipe.forEach(m=>{ pdf += `<tr><td>${m.nome||''}</td><td>${m.funcao||''}</td><td>${m.entrada||''}</td><td>${m.saida||''}</td></tr>`; });
-        pdf += `</tbody></table></div>`;
+        bodyHtml += `<div class="pdf-section"><div class="pdf-section-title">Equipe</div>`+
+                    `<table class="pdf-table"><thead><tr><th>Nome</th><th>Função</th><th>Entrada</th><th>Saída</th></tr></thead><tbody>`;
+        formData.equipe.forEach(m=>{ bodyHtml += `<tr><td>${m.nome||''}</td><td>${m.funcao||''}</td><td>${m.entrada||''}</td><td>${m.saida||''}</td></tr>`; });
+        bodyHtml += `</tbody></table></div>`;
       }
 
-      // Fotos
-      const photoCount = (window.__photos?.length||0);
       if(photoCount){
-        pdf += maybePageBreakBeforePhotos(formData.equipe?.length||0, photoCount);
-        pdf += `<div class="pdf-section"><div class="pdf-section-title">Anexos de Fotos</div><div class="pdf-imggrid">`;
-        window.__photos.forEach((f,i)=>{
+        bodyHtml += maybePageBreakBeforePhotos(formData.equipe?.length||0, photoCount);
+        bodyHtml += `<div class="pdf-section"><div class="pdf-section-title">Anexos de Fotos</div><div class="pdf-imggrid">`;
+        photos.forEach((f,i)=>{
           if(f?.dataUrl){
-            pdf += `<div class="pdf-imgwrap"><div class="pdf-imgbox"><img src="${f.dataUrl}" alt="Foto ${i+1}"></div><div class="pdf-caption">${f.legenda||('Foto '+(i+1))}</div></div>`;
-            // quebra a cada 6 fotos para melhor distribuição
+            bodyHtml += `<div class="pdf-imgwrap"><div class="pdf-imgbox"><img src="${f.dataUrl}" alt="Foto ${i+1}"></div><div class="pdf-caption">${f.legenda||('Foto '+(i+1))}</div></div>`;
             if(((i+1) % 6) === 0 && (i+1) < photoCount){
-              pdf += `</div></div><div class="page-break"></div><div class="pdf-section"><div class="pdf-section-title">Anexos de Fotos (cont.)</div><div class="pdf-imggrid">`;
+              bodyHtml += `</div></div><div class="page-break"></div><div class="pdf-section"><div class="pdf-section-title">Anexos de Fotos (cont.)</div><div class="pdf-imggrid">`;
             }
           }
         });
-        pdf += `</div></div>`;
+        bodyHtml += `</div></div>`;
       }
 
-      pdf += `</div>`; // fecha pdf-content
+      // monta documento com footer repetido em todas as páginas
+      const footerHtml =
+        `<div class="signature-section">
+           <div class="signature-title">ASSINATURAS</div>
+           <div class="signature-grid">
+             <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Supervisão</div><div class="signature-role">Responsável pela supervisão</div></div>
+             <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Planejamento</div><div class="signature-role">Responsável pelo planejamento</div></div>
+             <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Resp. Contratante</div><div class="signature-role">Responsável pelo contratante</div></div>
+             <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Resp. Contratante</div><div class="signature-role">Responsável pelo contratante</div></div>
+           </div>
+         </div>`;
 
-      // Rodapé de assinaturas fixo
-      pdf += `<div class="signature-section">`+
-             `  <div class="signature-title">ASSINATURAS</div>`+
-             `  <div class="signature-grid">`+
-             `    <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Supervisão</div><div class="signature-role">Responsável pela supervisão</div></div>`+
-             `    <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Planejamento</div><div class="signature-role">Responsável pelo planejamento</div></div>`+
-             `    <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Resp. Contratante</div><div class="signature-role">Responsável pelo contratante</div></div>`+
-             `    <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Resp. Contratante</div><div class="signature-role">Responsável pelo contratante</div></div>`+
-             `  </div>`+
-             `</div>`;
+      const html =
+        `<div class="pdf-doc">
+           <div class="pdf-body"><div class="pdf-content">${bodyHtml}</div></div>
+           <div class="pdf-footer-fixed">${footerHtml}</div>
+         </div>`;
 
-      $('#pdf-container').html(pdf);
-      await new Promise(r=>setTimeout(r,350));
+      $('#pdf-container').html(html);
+      await new Promise(r=>setTimeout(r,300));
       window.print();
     }
 
+    /* ===================== UI: EVENTOS ===================== */
     $(function(){
       populateEmpresas(); setToday(); updateProgress();
 
       $('#empresa').on('change', function(){ const v=$(this).val(); populateAreas(v); populateObras(v); updateProgress(); });
       $('#obra').on('change', function(){ const pc=$(this).find('option:selected').data('pc')||''; $('#obraPc').val(pc); updateProgress(); });
-
       $('.clima').on('click', function(){ $('.clima').removeClass('active'); $(this).addClass('active'); $('#clima').val($(this).data('clima')); updateProgress(); });
-
       $('#data,#turno,#encarregado,#area').on('change', updateProgress);
 
-      // Delegated handler
       $(document).on('click','#add-atividade', function(){
         $('#atividades-container').append(`
           <div class="chip">
@@ -515,6 +528,7 @@ body.sidebar-open{overflow:hidden}
             </div>
           </div>`);
       });
+
       $(document).on('click','#add-funcionario', function(){
         $('#equipe-container').append(`
           <div class="chip">
@@ -547,6 +561,7 @@ body.sidebar-open{overflow:hidden}
             </div>
           </div>`);
       });
+
       $(document).on('click','.remove-item', function(){ $(this).closest('.chip').remove(); });
 
       $(document).on('click','#add-foto', function(){
@@ -616,13 +631,22 @@ body.sidebar-open{overflow:hidden}
 
       $('#submitBtn').on('click', async function(){
         const required=['empresa','obra','data','turno','encarregado','area','clima'];
-        for(const id of required){ if(!$('#'+id).val()){ showToast('Preencha os campos obrigatórios','error'); $('#stepsNav a[href="#step-basicos"]').tab('show'); return; } }
+        for(const id of required){
+          if(!$('#'+id).val()){
+            showToast('Preencha os campos obrigatórios','error');
+            $('#stepsNav a[href="#step-basicos"]').tab('show'); return;
+          }
+        }
         const formData = collectFormData();
         window.__photos = [];
         const $inputs = $('.foto-input');
         for(let i=0;i<$inputs.length;i++){
           const file=$inputs[i].files?.[0];
-          if(file){ const dataUrl = await readFileAsDataURL(file); const legenda=$($inputs[i]).closest('.col-md-4').find('.foto-legenda').val(); window.__photos.push({dataUrl,legenda}); }
+          if(file){
+            const dataUrl = await readFileAsDataURL(file);
+            const legenda=$($inputs[i]).closest('.col-md-4').find('.foto-legenda').val();
+            window.__photos.push({dataUrl,legenda});
+          }
         }
         await generatePDF(formData,false);
       });
@@ -657,44 +681,37 @@ body.sidebar-open{overflow:hidden}
         }
       });
     });
+
+    /* ===================== SIDEBAR OFF-CANVAS ===================== */
+    (function(){
+      const mqMobile = window.matchMedia('(max-width: 991px)');
+      function closeSidebar(){
+        document.querySelector('.sidebar')?.classList.remove('open');
+        document.getElementById('sidebarBackdrop')?.classList.remove('show');
+        document.body.classList.remove('sidebar-open');
+      }
+      function openSidebar(){
+        document.querySelector('.sidebar')?.classList.add('open');
+        document.getElementById('sidebarBackdrop')?.classList.add('show');
+        document.body.classList.add('sidebar-open');
+      }
+      document.getElementById('menuToggle')?.addEventListener('click', function(){
+        const s = document.querySelector('.sidebar');
+        if (!s) return;
+        if (s.classList.contains('open')) closeSidebar(); else openSidebar();
+      });
+      document.getElementById('sidebarBackdrop')?.addEventListener('click', closeSidebar);
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSidebar(); });
+      const stepsNav = document.getElementById('stepsNav');
+      if (stepsNav){
+        stepsNav.addEventListener('click', function(e){
+          if (e.target.closest('.nav-link') && mqMobile.matches) closeSidebar();
+        });
+      }
+      mqMobile.addEventListener?.('change', () => { if (!mqMobile.matches) closeSidebar(); });
+    })();
   </script>
 
   <div id="sidebarBackdrop" class="sidebar-backdrop d-lg-none"></div>
-
-<script>
-// Toggle off-canvas no mobile
-(function(){
-  const mqMobile = window.matchMedia('(max-width: 991px)');
-  function closeSidebar(){
-    document.querySelector('.sidebar')?.classList.remove('open');
-    document.getElementById('sidebarBackdrop')?.classList.remove('show');
-    document.body.classList.remove('sidebar-open');
-  }
-  function openSidebar(){
-    document.querySelector('.sidebar')?.classList.add('open');
-    document.getElementById('sidebarBackdrop')?.classList.add('show');
-    document.body.classList.add('sidebar-open');
-  }
-  document.getElementById('menuToggle')?.addEventListener('click', function(){
-    const s = document.querySelector('.sidebar');
-    if (!s) return;
-    if (s.classList.contains('open')) closeSidebar(); else openSidebar();
-  });
-  document.getElementById('sidebarBackdrop')?.addEventListener('click', closeSidebar);
-  document.addEventListener('keydown', function(e){
-    if (e.key === 'Escape') closeSidebar();
-  });
-  const stepsNav = document.getElementById('stepsNav');
-  if (stepsNav){
-    stepsNav.addEventListener('click', function(e){
-      if (e.target.closest('.nav-link') && mqMobile.matches) closeSidebar();
-    });
-  }
-  mqMobile.addEventListener?.('change', () => {
-    if (!mqMobile.matches) closeSidebar();
-  });
-})();
-</script>
-
 </body>
 </html>
