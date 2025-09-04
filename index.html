@@ -1,1664 +1,700 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatório Diario - Sistema de Registro</title>
-    <!-- ICON -->
-    <link rel="icon" type="image/png" href="https://st5.depositphotos.com/4520249/65196/v/450/depositphotos_651965852-stock-illustration-valid-user-profile-icon-vector.jpg">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #002060;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --success-color: #27ae60;
-            --light-color: #ecf0f1;
-            --dark-color: #002060;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RDO – Nova Interface V2</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="https://powerembedded.blob.core.windows.net/images/339675c7-1df7-48ea-9b89-6b9ca06b8bd8/organization/favicon.png">
+  <style>
+    :root{
+      --brand:#111827;--brand-600:#1f2937;--brand-700:#0f172a;--accent:#2563eb;--ok:#16a34a;--warn:#f59e0b;--err:#ef4444;--muted:#6b7280;--paper:#ffffff;--bg:#f3f4f6
+    }
+    html,body{height:100%}
+    body{background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial}
 
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-bottom: 100px;
-        }
+    .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+    .sidebar{background:var(--brand-700);color:#fff;position:sticky;top:0;align-self:start;height:100vh}
+    .sidebar .brand{display:flex;align-items:center;gap:.6rem;padding:1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.06)}
+    .brand i{font-size:1.25rem;color:#93c5fd}
+    .brand .title{font-weight:700;letter-spacing:.3px}
+    .step-nav{padding:.75rem}
+    .step-nav .nav-link{color:#cbd5e1;border-radius:.6rem;padding:.65rem .8rem;display:flex;align-items:center;gap:.55rem}
+    .step-nav .nav-link.active{background:rgba(37,99,235,.18);color:#fff;border:1px solid rgba(37,99,235,.35)}
+    .step-nav .badge{margin-left:auto}
 
-        .navbar {
-            background-color: var(--primary-color);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
+    .content{padding:1.2rem 1.4rem}
+    .topbar{background:var(--paper);border-radius:1rem;box-shadow:0 6px 20px rgba(15,23,42,.06);padding:.9rem 1rem;margin-bottom:1.1rem;display:flex;gap:.75rem;align-items:center}
+    .panel{background:var(--paper);border-radius:1rem;box-shadow:0 6px 20px rgba(15,23,42,.06);padding:1rem;margin-bottom:1.1rem}
+    .panel h5{margin:0 0 .8rem;color:#111827;font-weight:700}
+    .muted{color:var(--muted)}
 
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            border: none;
-            transition: transform 0.3s;
-        }
+    .progress-lite{height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+    .progress-lite .bar{height:100%;width:0;background:var(--accent)}
 
-        .card:hover {
-            transform: translateY(-5px);
-        }
+    .chip{background:#f1f5f9;border:1px dashed #e2e8f0;border-radius:.75rem;padding:.85rem}
 
-        .card-header {
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 10px 10px 0 0 !important;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    .clima-grid{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:.7rem}
+    .clima{cursor:pointer;border:1px solid #e5e7eb;border-radius:.8rem;padding:.8rem;text-align:center;transition:all .15s ease;background:#fff}
+    .clima i{font-size:1.25rem;margin-bottom:.25rem;display:block}
+    .clima.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
 
-        .card-header .badge {
-            font-size: 0.7rem;
-        }
+    .thumb{height:180px;border:2px dashed #e5e7eb;border-radius:.8rem;display:flex;align-items:center;justify-content:center;background:#fafafa;overflow:hidden}
+    .thumb img{max-width:100%;max-height:100%;object-fit:contain}
 
-        .btn-primary {
-            background-color: var(--secondary-color);
-            border: none;
-        }
+    .fab{position:fixed;right:24px;bottom:24px;display:flex;flex-direction:column;gap:12px;z-index:1000}
+    .fab .btn{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 18px rgba(15,23,42,.2)}
 
-        .btn-primary:hover {
-            background-color: #2980b9;
-        }
+    footer{position:fixed;left:0;right:0;bottom:0;background:var(--brand-700);color:#e5e7eb;padding:.65rem}
 
-        .btn-success {
-            background-color: var(--success-color);
-            border: none;
-        }
+    /* PRINT / PDF */
+    #pdf-container{display:none;font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .pdf-header{display:flex;gap:16px;align-items:center;border-bottom:2px solid #002060;padding-bottom:8px;margin-bottom:10px}
+    .pdf-header img{max-height:64px}
+    .pdf-h-title{color:#002060;font-size:20px;font-weight:700;margin:0}
 
-        .btn-danger {
-            background-color: var(--accent-color);
-            border: none;
-        }
-        
-        .section-title {
-            border-left: 4px solid var(--secondary-color);
-            padding-left: 10px;
-            margin: 20px 0;
-            color: var(--dark-color);
-        }
+    .pdf-info{border:1px solid #ddd;border-radius:6px;padding:10px;margin:10px 0;background:#fafafa}
+    .pdf-grid{display:flex;flex-wrap:wrap;gap:10px}
+    .pdf-col{flex:1;min-width:200px}
+    .pdf-label{font-weight:700;color:#002060}
 
-        .image-preview {
-            width: 100%;
-            height: 200px;
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            margin-bottom: 15px;
-            background-color: #f9f9f9;
-        }
+    .pdf-section{margin:10px 0}
+    .pdf-section-title{background:#002060;color:#fff;padding:6px;border-radius:4px;font-weight:700}
+    .pdf-table{width:100%;border-collapse:collapse}
+    .pdf-table th,.pdf-table td{border:1px solid #ddd;padding:6px;text-align:left}
+    .pdf-imggrid{display:flex;flex-wrap:wrap;gap:12px}
+    .pdf-imgwrap{flex:1 1 30%;max-width:33%}
+    .pdf-imgbox{height:180px;border:1px solid #ddd;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .pdf-imgbox img{max-width:100%;max-height:100%;object-fit:contain}
+    .pdf-caption{text-align:center;font-style:italic;font-size:.9em;margin-top:4px}
 
-        .image-preview img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
+    .signature-section{margin-top:16px}
+    .signature-title{text-align:center;font-weight:700;color:#002060;border-top:1px solid #ddd;padding-top:8px;margin-bottom:6px}
+    .signature-grid{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .signature-box{width:23%;min-width:150px;text-align:center}
+    .signature-line{height:1px;background:#000;margin:28px 0 6px}
+    .signature-name{font-weight:700}
+    .signature-role{font-size:.9em;color:#555}
 
-        .image-container {
-            position: relative;
-            margin-bottom: 15px;
-        }
+    .pdf-footer{margin-top:10px;color:#666;text-align:center;font-size:11px;border-top:1px solid #ddd;padding-top:8px}
 
-        .image-actions {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            display: flex;
-            gap: 5px;
-        }
+    @media print{
+      /* Reserva espaço para o rodapé de assinatura em TODAS as páginas */
+      @page{ size: A4 portrait; margin: 12mm 10mm 36mm 10mm; }
 
-        .function-item {
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 3px solid var(--secondary-color);
-        }
+      body,html{margin:0;padding:0;background:#fff;color:#000}
+      .app,.topbar,.sidebar,.fab,footer{display:none !important}
+      #pdf-container{display:block !important;padding:0;margin:0;font-size:10pt}
 
-        .footer {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 20px 0;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-        }
+      /* Cabeçalho e elementos que não podem quebrar no meio */
+      .pdf-header{page-break-inside:avoid}
+      .avoid-break{break-inside:avoid}
+      .pdf-imgwrap{break-inside:avoid}
+      .page-break{break-before:page}
 
+      /* Tabelas: repete o cabeçalho e evita quebrar linhas ao meio */
+      .pdf-table thead{display:table-header-group}
+      .pdf-table tr{page-break-inside:avoid;break-inside:avoid}
 
-        .floating-buttons {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+      /* Rodapé de assinaturas fixo em todas as páginas */
+      .signature-section{
+        position:fixed;left:0;right:0;bottom:0;height:36mm;background:#fff
+      }
+      .signature-grid{padding:0 10mm}
+      /* não precisamos mais "empurrar" o conteúdo para cima em cada página */
+      .pdf-content{margin:0}
+    }
 
-        .floating-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            font-size: 20px;
-            transition: all 0.3s;
-        }
+    /* RESPONSIVO */
+    @media (max-width: 991px){
+      .app{grid-template-columns:1fr}
+      .sidebar{position:relative;height:auto}
+      .content{padding:0.9rem}
+      .clima-grid{grid-template-columns:repeat(2,minmax(120px,1fr))}
+      .thumb{height:160px}
+      .fab{right:16px;bottom:16px}
+      .fab .btn{width:52px;height:52px}
+    }
+    @media (max-width: 575.98px){
+      .content{padding:0.7rem}
+      .panel{padding:.85rem}
+      .clima-grid{grid-template-columns:repeat(2,minmax(100px,1fr))}
+      .chip{padding:.75rem}
+      .thumb{height:140px}
+    }
+  
+/* Sidebar off-canvas mobile */
+body.sidebar-open{overflow:hidden}
+.sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1030;display:none;opacity:0;transition:opacity .2s ease}
+.sidebar-backdrop.show{display:block;opacity:1}
+@media (max-width: 991px){
+  .app{grid-template-columns:1fr}
+  .sidebar{
+    position:fixed;left:0;top:0;bottom:0;width:280px;height:100vh;
+    z-index:1040;transform:translateX(-100%);transition:transform .25s ease;
+    box-shadow:0 10px 24px rgba(0,0,0,.25)
+  }
+  .sidebar.open{transform:translateX(0)}
+  .topbar{align-items:center}
+}
 
-        .floating-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .clima-selector {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .clima-option {
-            flex: 1;
-            min-width: 120px;
-            text-align: center;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .clima-option:hover {
-            border-color: var(--secondary-color);
-        }
-
-        .clima-option.selected {
-            border-color: var(--secondary-color);
-            background-color: rgba(52, 152, 219, 0.1);
-        }
-
-        .clima-option i {
-            font-size: 24px;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .time-inputs {
-            display: flex;
-            gap: 10px;
-        }
-
-        .time-inputs .form-control {
-            flex: 1;
-        }
-
-        .progress-bar-container {
-            height: 8px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background-color: var(--secondary-color);
-            border-radius: 4px;
-            width: 0%;
-            transition: width 0.5s;
-        }
-
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        /* Estilos para o PDF */
-        #pdf-container {
-            display: none;
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: white;
-            color: black;
-        }
-
-        .pdf-header {
-            text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #002060;
-            padding-bottom: 10px;
-            position: relative;
-        }
-
-        .pdf-section {
-            margin-bottom: 15px;
-            page-break-inside: avoid;
-        }
-
-        .pdf-section-title {
-            background-color: #002060;
-            color: white;
-            padding: 8px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            border-radius: 4px;
-        }
-
-        .pdf-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-        }
-
-        .pdf-table th, .pdf-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        .pdf-table th {
-            background-color: #f2f2f2;
-        }
-
-        .pdf-image-container {
-            margin-bottom: 15px;
-            page-break-inside: avoid;
-        }
-
-        .pdf-image {
-            max-width: 100%;
-            max-height: 300px;
-            margin-bottom: 5px;
-            border: 1px solid #ddd;
-        }
-
-        .pdf-image-caption {
-            font-style: italic;
-            font-size: 0.9em;
-            text-align: center;
-        }
-
-        .pdf-logo {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 120px;
-        }
-        
-        .pdf-logo img {
-            max-height: 70px;
-        }
-        
-        .pdf-header-content {
-            margin-left: 90px;
-        }
-        
-        .pdf-header h1 {
-            color: #002060;
-            font-size: 24px;
-            margin: 10px 0 5px 0;
-        }
-        
-        .pdf-header p {
-            color: #666;
-            font-size: 14px;
-            margin: 0;
-        }
-        
-        .pdf-info-box {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .pdf-info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .pdf-info-item {
-            flex: 1;
-            min-width: 200px;
-            margin-bottom: 10px;
-        }
-        
-        .pdf-info-label {
-            font-weight: bold;
-            color: #002060;
-            margin-bottom: 3px;
-        }
-        
-        .pdf-images-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .pdf-image-wrapper {
-            flex: 1 1 30%;
-            max-width: 33.333%;
-            margin-bottom: 15px;
-            page-break-inside: avoid;
-        }
-        
-        .pdf-image-box {
-            border: 1px solid #ddd;
-            padding: 8px;
-            border-radius: 5px;
-            background: white;
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        
-        .pdf-image-box img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-        
-        .signature-section {
-            margin-top: 30px;
-            page-break-inside: avoid;
-        }
-        
-        .signature-title {
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #002060;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-        }
-        
-        .signature-grid {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-        
-        .signature-box {
-            width: 23%;
-            min-width: 150px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .signature-line {
-            height: 1px;
-            background-color: #000;
-            margin: 40px 0 10px 0;
-        }
-        
-        .signature-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .signature-role {
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        .pdf-footer {
-            margin-top: 30px;
-            font-size: 11px;
-            color: #666;
-            text-align: center;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-        }
-
-        @media print {
-            body, html {
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                font-size: 10pt !important;
-                line-height: 1.2 !important;
-                background: white !important;
-                color: black !important;
-            }
-            
-            .navbar, .btn, .footer, .print-btn, .action-buttons,
-            .toast-container, .progress-bar-container, .floating-buttons {
-                display: none !important;
-            }
-            
-            .container {
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 0.1in !important;
-                margin: 0 !important;
-            }
-            
-            #rdoForm, .container {
-                display: none !important;
-            }
-
-            #pdf-container {
-                display: block !important;
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0.2in !important;
-                font-size: 10pt !important;
-                position: relative;
-            }
-            
-            .pdf-header {
-                margin-bottom: 0.2in !important;
-                padding-bottom: 0.1in !important;
-            }
-            
-            .pdf-logo {
-                position: absolute;
-                left: -13px;
-                top: -13px;
-                width: 1.2in !important;
-            }
-            
-            .pdf-header-content {
-                margin-left: 1.4in !important;
-            }
-            
-            .pdf-header h1 {
-                font-size: 14pt !important;
-                margin: 5px 0 !important;
-            }
-            
-            .pdf-header p {
-                font-size: 9pt !important;
-                margin: 0 !important;
-            }
-            
-            .pdf-info-box {
-                padding: 0.1in !important;
-                margin-bottom: 0.2in !important;
-            }
-            
-            .pdf-info-item {
-                margin-bottom: 0.05in !important;
-                min-width: auto !important;
-            }
-            
-            .pdf-info-label {
-                font-size: 9pt !important;
-                margin-bottom: 0.02in !important;
-            }
-            
-            .pdf-section {
-                margin-bottom: 0.15in !important;
-                page-break-inside: avoid !important;
-            }
-            
-            .pdf-section-title {
-                padding: 0.08in !important;
-                font-size: 10pt !important;
-                margin-bottom: 0.08in !important;
-            }
-            
-            .pdf-table {
-                font-size: 9pt !important;
-                margin-bottom: 0.1in !important;
-            }
-            
-            .pdf-table th, .pdf-table td {
-                padding: 0.06in !important;
-            }
-            
-            .pdf-images-grid {
-                gap: 0.1in !important;
-                margin-bottom: 0.1in !important;
-            }
-            
-            .pdf-image-wrapper {
-                width: calc(50% - 0.05in) !important;
-                margin-bottom: 0.1in !important;
-            }
-            
-            .pdf-image-box {
-                height: 1.2in !important;
-                padding: 0.05in !important;
-            }
-            
-            .pdf-image-caption {
-                font-size: 8pt !important;
-            }
-            
-            .signature-section {
-                margin-top: 0.5in !important;
-                page-break-inside: avoid !important;
-                position: relative !important;
-                bottom: auto !important;
-                left: auto !important;
-                right: auto !important;
-            }
-            
-            .signature-title {
-                margin-bottom: 0.1in !important;
-                font-size: 10pt !important;
-                padding-bottom: 0.05in !important;
-            }
-            
-            .signature-line {
-                margin: 0.3in 0 0.05in 0 !important;
-            }
-            
-            .signature-name {
-                font-size: 9pt !important;
-                margin-bottom: 0.02in !important;
-            }
-            
-            .signature-role {
-                font-size: 8pt !important;
-            }
-            
-            .pdf-footer {
-                margin-top: 0.5in !important;
-                font-size: 9pt !important;
-                padding-top: 0.05in !important;
-                border-top: 1px solid #ddd !important;
-                position: relative !important;
-                bottom: auto !important;
-                left: auto !important;
-                right: auto !important;
-                text-align: center !important;
-            }
-            
-            .avoid-break {
-                page-break-inside: avoid !important;
-            }
-            
-            ol, ul {
-                padding-left: 0.2in !important;
-                margin-bottom: 0.1in !important;
-            }
-            
-            li {
-                margin-bottom: 0.05in !important;
-            }
-
-            .pdf-content {
-                margin-bottom: 0.5in !important;
-            }
-            
-            .signature-grid {
-                display: flex !important;
-                justify-content: space-around !important;
-                flex-wrap: wrap !important;
-            }
-            
-            .signature-box {
-                width: 23% !important;
-                min-width: 150px !important;
-                margin-bottom: 20px !important;
-                text-align: center !important;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .pdf-image-wrapper {
-                width: 100% !important;
-            }
-            
-            .signature-box {
-                width: 48% !important;
-            }
-            
-            .floating-buttons {
-                bottom: 20px;
-                right: 20px;
-            }
-            
-            .floating-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 16px;
-            }
-        }
-    </style>
+  </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-hard-hat me-2"></i>
-                Relatório Diario
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i> Início</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-history me-1"></i> Histórico</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-cog me-1"></i> Configurações</a>
-                    </li>
-                </ul>
-            </div>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <i class="fa-solid fa-hard-hat"></i>
+        <div>
+          <div class="title">Estel</div>
+          <small class="text-secondary">Relatório Diário</small>
         </div>
-    </nav>
+      </div>
+      <nav class="step-nav nav flex-column" id="stepsNav" role="tablist">
+        <a class="nav-link active" data-bs-toggle="tab" href="#step-basicos" role="tab"><i class="fa-solid fa-circle-info"></i> Dados básicos <span class="badge bg-secondary" style="color:orange;">*</span></a>
+        <a class="nav-link" data-bs-toggle="tab" href="#step-clima" role="tab"><i class="fa-solid fa-cloud-sun"></i> Clima <span class="badge bg-secondary" style="color:orange;">*</span></a>
+        <a class="nav-link" data-bs-toggle="tab" href="#step-ativ" role="tab"><i class="fa-solid fa-list-check"></i> Atividades <span class="badge bg-secondary" style="color:orange;">*</span></a>
+        <a class="nav-link" data-bs-toggle="tab" href="#step-equipe" role="tab"><i class="fa-solid fa-users"></i> Equipe <span class="badge bg-secondary" style="color:orange;">*</span></a>
+        <a class="nav-link" data-bs-toggle="tab" href="#step-fotos" role="tab"><i class="fa-solid fa-camera"></i> Fotos</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#step-obs" role="tab"><i class="fa-solid fa-note-sticky"></i> Observações</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#step-revisao" role="tab"><i class="fa-solid fa-eye"></i> Revisão</a>
+      </nav>
+    </aside>
 
-    <!-- Toast para notificações -->
-    <div class="toast-container">
-        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <strong class="me-auto">Relatório Diario</strong>
-                <small>Agora</small>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body"></div>
-        </div>
-    </div>
-
-    <!-- Progress Bar -->
-    <div class="container mt-3">
-        <div class="progress-bar-container">
-            <div class="progress-bar" id="form-progress"></div>
-        </div>
-    </div>
-
-    <!-- Conteúdo Principal -->
-    <div class="container mt-4">
-        <h1 class="display-4 text-center mb-4">Registro Diário de Obra - RDO</h1>
-        
-        <form id="rdoForm">
-            <!-- Dados Básicos -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <div>
-                        <i class="fas fa-info-circle me-2"></i>Dados Básicos
-                    </div>
-                    <span class="badge bg-secondary">Obrigatório</span>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="empresa" class="form-label">Cliente</label>
-                            <select class="form-select" id="empresa" required>
-                                <option value="">Selecione o cliente...</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="obra" class="form-label">Serviço</label>
-                            <select class="form-select" id="obra" required>
-                                <option value="">Primeiro selecione o cliente...</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="obraPc" class="form-label">Nº do Pedido (PC)</label>
-                            <input type="text" class="form-control" id="obraPc" readonly>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="data" class="form-label">Data</label>
-                            <input type="date" class="form-control" id="data" required>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="turno" class="form-label">Turno</label>
-                            <select class="form-select" id="turno" required>
-                                <option value="">Selecione...</option>
-                                <option value="manha">Manhã (07:30 - 12:00)</option>
-                                <option value="tarde">Tarde (12:00 - 17:18)</option>
-                                <option value="noite">Noite (19:00 - 00:00)</option>
-                                <option value="madrugada">Noite (01:00 - 04:48)</option>
-                                <option value="integral-dia">Integral Dia (07:30 - 17:18)</option>
-                                <option value="integral-noite">Integral Noite (19:00 - 04:48)</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="encarregado" class="form-label">Encarregado</label>
-                            <select class="form-select" id="encarregado" required>
-                                <option value="">Selecione o encarregado...</option>
-                                <option value="CLEOMARCIO ALMEIDA DOS SANTOS">CLEOMARCIO ALMEIDA DOS SANTOS</option>
-                                <option value="GLECIO PEREIRA DE OLIVEIRA">GLECIO PEREIRA DE OLIVEIRA</option>
-                                <option value="JOAO BATISTA FERREIRA DE ARAUJO">JOAO BATISTA FERREIRA DE ARAUJO</option>
-                                <option value="JUAREZ RODRIGUES RIBEIRO">JUAREZ RODRIGUES RIBEIRO</option>
-                                <option value="MARCELO EDUARDO RAMPINELLI ROSA">MARCELO EDUARDO RAMPINELLI ROSA</option>
-                                <option value="MARCIO WESLEY FANCHIOTI">MARCIO WESLEY FANCHIOTI</option>
-                                <option value="ODIMAR PASSOS SOUZA">ODIMAR PASSOS SOUZA</option>
-                                <option value="RILDO DE MORAES SILVA">RILDO DE MORAES SILVA</option>
-                                <option value="VINICIUS DE JESUS SILVA">VINICIUS DE JESUS SILVA</option>
-                                <option value="WENDREO RAMOS DANTAS">WENDREO RAMOS DANTAS</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label for="area" class="form-label">Área/Unidade</label>
-                            <select class="form-select" id="area" required>
-                                <option value="">Primeiro selecione o cliente...</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Condições Climáticas -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <div>
-                        <i class="fas fa-cloud-sun me-2"></i>Condições Climáticas
-                    </div>
-                    <span class="badge bg-secondary">Obrigatório</span>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Tempo durante o dia</label>
-                        <div class="clima-selector">
-                            <div class="clima-option" data-clima="ensolarado">
-                                <i class="fas fa-sun"></i>
-                                <span>Ensolarado</span>
-                            </div>
-                            <div class="clima-option" data-clima="nublado">
-                                <i class="fas fa-cloud"></i>
-                                <span>Nublado</span>
-                            </div>
-                            <div class="clima-option" data-clima="chuvoso">
-                                <i class="fas fa-cloud-rain"></i>
-                                <span>Chuvoso</span>
-                            </div>
-                            <div class="clima-option" data-clima="tempestuoso">
-                                <i class="fas fa-poo-storm"></i>
-                                <span>Tempestuoso</span>
-                            </div>
-                        </div>
-                        <input type="hidden" id="clima" required>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Atividades Realizadas -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <div>
-                        <i class="fas fa-tasks me-2"></i>Atividades Realizadas
-                    </div>
-                    <span class="badge bg-secondary">Obrigatório</span>
-                </div>
-                <div class="card-body">
-                    <div id="atividades-container">
-                        <div class="function-item">
-                            <div class="mb-3">
-                                <label class="form-label">Descrição da Atividade</label>
-                                <textarea class="form-control" name="atividade[]" rows="3" required placeholder="Descreva detalhadamente a atividade realizada..."></textarea>
-                            </div>
-                            <button type="button" class="btn btn-sm btn-danger remove-item">
-                                <i class="fas fa-trash me-1"></i>Remover
-                            </button>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-secondary mt-2" id="add-atividade">
-                        <i class="fas fa-plus me-1"></i>Adicionar Atividade
-                    </button>
-                </div>
-            </div>
-
-            <!-- Equipe -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <div>
-                        <i class="fas fa-users me-2"></i>Equipe
-                    </div>
-                    <span class="badge bg-secondary">Obrigatório</span>
-                </div>
-                <div class="card-body">
-                    <div id="equipe-container">
-                        <div class="function-item">
-                            <div class="row">
-                                <div class="col-md-5 mb-3">
-                                    <label class="form-label">Nome do Funcionário</label>
-                                    <input type="text" class="form-control" name="funcionario[]" required>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Função</label>
-                                    <select class="form-select" name="funcao[]">
-                                        <option value="">Selecione...</option>
-                                        <option value="Soldador">Soldador</option>
-                                        <option value="Encanador">Encanador</option>
-                                        <option value="Caldeireiro">Caldeireiro</option>
-                                        <option value="Mecânico">Mecânico</option>
-                                        <option value="Eletrícista">Eletrícista</option>
-                                        <option value="Auxiliar">Auxiliar</option>
-                                        <option value="Almoxarife">Almoxarife</option>
-                                        <option value="Técnico de Segurança">Técnico de Segurança</option>
-                                        <option value="Encarregado">Encarregado</option>
-                                        <option value="Administrativo">Administrativo</option>
-                                        <option value="Inspetor">Inspetor</option>
-                                        <option value="Planejador">Planejador</option>
-                                        <option value="Supervisor">Supervisor</option>
-                                        <option value="Coordenador">Coordenador</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Horário de Trabalho</label>
-                                    <div class="time-inputs">
-                                        <input type="time" class="form-control" name="entrada[]">
-                                        <input type="time" class="form-control" name="saida[]">
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-sm btn-danger remove-item">
-                                <i class="fas fa-trash me-1"></i>Remover
-                            </button>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-secondary mt-2" id="add-funcionario">
-                        <i class="fas fa-user-plus me-1"></i>Adicionar Funcionário
-                    </button>
-                </div>
-            </div>
-
-            <!-- Anexos de Fotos -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-camera me-2"></i>Anexos de Fotos
-                </div>
-                <div class="card-body">
-                    <div class="row" id="fotos-container">
-                        <div class="col-md-4 mb-3">
-                            <div class="image-preview">
-                                <span class="text-muted">Pré-visualização da imagem</span>
-                            </div>
-                            <input type="file" class="form-control foto-input" accept="image/*">
-                            <div class="mt-2">
-                                <input type="text" class="form-control form-control-sm foto-legenda" placeholder="Legenda da foto">
-                            </div>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-secondary mt-2" id="add-foto">
-                        <i class="fas fa-plus me-1"></i>Adicionar Mais Fotos
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <!-- Container para o PDF (inicialmente oculto) -->
-    <div id="pdf-container"></div>
-
-    <!-- Footer -->
-    <footer class="footer text-center">
-        <div class="container">
-            <p>Relatório Diario &copy; 2025 - Thaynison Couto</p>
-        </div>
-    </footer>
-
-    <!-- BOTÕES FLUTUANTES - MELHORIA 2 -->
-    <div class="floating-buttons">
-        <button class="btn btn-info floating-btn" id="previewBtn" title="Visualizar Impressão">
-            <i class="fas fa-eye"></i>
+    <main class="content">
+      <div class="topbar d-flex justify-content-between">
+        <button id="menuToggle" class="btn btn-outline-primary d-lg-none me-2" aria-label="Abrir menu">
+          <i class="fa-solid fa-bars"></i>
         </button>
-        <button class="btn btn-danger floating-btn" id="clearAllFloat" title="Excluir Tudo">
-            <i class="fas fa-trash"></i>
-        </button>
-        <button class="btn btn-primary floating-btn" id="submitBtn" title="Salvar e Exportar">
-            <i class="fas fa-save"></i>
-        </button>
-    </div>
-
-    <!-- Modal de Confirmação -->
-    <div class="modal fade" id="confirmClearModal" tabindex="-1" aria-labelledby="confirmClearLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-3 shadow">
-                <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="confirmClearLabel">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Exclusão
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <div class="modal-body">
-                <p class="mb-0">Tem certeza que deseja limpar <strong>todos os dados</strong> do formulário? Essa ação não poderá ser desfeita.</p>
-                </div>
-                <div class="modal-footer">
-                <button type="button" class="btn btn-danger" id="confirmClearBtn">Sim, limpar tudo</button>
-                </div>
-            </div>
+        <div class="w-100">
+          <div class="progress-lite mb-2"><div id="progressBar" class="bar"></div></div>
+          <div class="d-flex align-items-center gap-2">
+            <h5 class="mb-0">Registro Diário de Obra</h5>
+            <span class="muted">Preencha por etapas e gere o PDF</span>
+          </div>
         </div>
+      </div>
+
+      <div class="tab-content">
+        <section class="tab-pane fade show active" id="step-basicos" role="tabpanel">
+          <div class="panel">
+            <h5>Dados básicos</h5>
+            <div class="row g-3">
+              <div class="col-lg-4">
+                <label class="form-label">Cliente</label>
+                <select id="empresa" class="form-select" required><option value="">Selecione o cliente...</option></select>
+              </div>
+              <div class="col-lg-4">
+                <label class="form-label">Serviço</label>
+                <select id="obra" class="form-select" required><option value="">Primeiro selecione o cliente...</option></select>
+              </div>
+              <div class="col-lg-4">
+                <label class="form-label">Nº do Pedido (PC)</label>
+                <input id="obraPc" class="form-control" type="text" readonly />
+              </div>
+              <div class="col-lg-4">
+                <label class="form-label">Data</label>
+                <input id="data" class="form-control" type="date" required />
+              </div>
+              <div class="col-lg-4">
+                <label class="form-label">Turno</label>
+                <select id="turno" class="form-select" required>
+                  <option value="">Selecione...</option>
+                  <option value="manha">Manhã (07:30 - 12:00)</option>
+                  <option value="tarde">Tarde (12:00 - 17:18)</option>
+                  <option value="noite">Noite (19:00 - 00:00)</option>
+                  <option value="madrugada">Noite (01:00 - 04:48)</option>
+                  <option value="integral-dia">Integral Dia (07:30 - 17:18)</option>
+                  <option value="integral-noite">Integral Noite (19:00 - 04:48)</option>
+                </select>
+              </div>
+              <div class="col-lg-4">
+                <label class="form-label">Encarregado</label>
+                <select id="encarregado" class="form-select" required>
+                  <option value="">Selecione o encarregado...</option>
+                  <option value="CLEOMARCIO ALMEIDA DOS SANTOS">CLEOMARCIO ALMEIDA DOS SANTOS</option>
+                  <option value="GLECIO PEREIRA DE OLIVEIRA">GLECIO PEREIRA DE OLIVEIRA</option>
+                  <option value="JOAO BATISTA FERREIRA DE ARAUJO">JOAO BATISTA FERREIRA DE ARAUJO</option>
+                  <option value="JUAREZ RODRIGUES RIBEIRO">JUAREZ RODRIGUES RIBEIRO</option>
+                  <option value="MARCELO EDUARDO RAMPINELLI ROSA">MARCELO EDUARDO RAMPINELLI ROSA</option>
+                  <option value="MARCIO WESLEY FANCHIOTI">MARCIO WESLEY FANCHIOTI</option>
+                  <option value="ODIMAR PASSOS SOUZA">ODIMAR PASSOS SOUZA</option>
+                  <option value="RILDO DE MORAES SILVA">RILDO DE MORAES SILVA</option>
+                  <option value="VINICIUS DE JESUS SILVA">VINICIUS DE JESUS SILVA</option>
+                  <option value="WENDREO RAMOS DANTAS">WENDREO RAMOS DANTAS</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Área/Unidade</label>
+                <select id="area" class="form-select" required><option value="">Primeiro selecione o cliente...</option></select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tab-pane fade" id="step-clima" role="tabpanel">
+          <div class="panel">
+            <h5>Condições climáticas</h5>
+            <div class="clima-grid">
+              <div class="clima" data-clima="ensolarado"><i class="fa-solid fa-sun"></i>Ensolarado</div>
+              <div class="clima" data-clima="nublado"><i class="fa-solid fa-cloud"></i>Nublado</div>
+              <div class="clima" data-clima="chuvoso"><i class="fa-solid fa-cloud-rain"></i>Chuvoso</div>
+              <div class="clima" data-clima="tempestuoso"><i class="fa-solid fa-poo-storm"></i>Tempestuoso</div>
+            </div>
+            <input id="clima" type="hidden" required />
+          </div>
+        </section>
+
+        <section class="tab-pane fade" id="step-ativ" role="tabpanel">
+          <div class="panel">
+            <div class="d-flex align-items-center justify-content-between">
+              <h5>Atividades realizadas</h5>
+              <button id="add-atividade" type="button" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-plus me-1"></i>Adicionar</button>
+            </div>
+            <div id="atividades-container" class="mt-3">
+              <div class="chip">
+                <label class="form-label">Descrição da atividade</label>
+                <textarea class="form-control" name="atividade[]" rows="3" required placeholder="Descreva detalhadamente a atividade realizada..."></textarea>
+                <div class="mt-2 text-end">
+                  <button type="button" class="btn btn-sm btn-outline-danger remove-item"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tab-pane fade" id="step-equipe" role="tabpanel">
+          <div class="panel">
+            <div class="d-flex align-items-center justify-content-between">
+              <h5>Equipe</h5>
+              <button id="add-funcionario" type="button" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-user-plus me-1"></i>Adicionar</button>
+            </div>
+            <div id="equipe-container" class="mt-3">
+              <div class="chip">
+                <div class="row g-3 align-items-end">
+                  <div class="col-lg-5">
+                    <label class="form-label">Nome do Funcionário</label>
+                    <input type="text" class="form-control" name="funcionario[]" required />
+                  </div>
+                  <div class="col-lg-3">
+                    <label class="form-label">Função</label>
+                    <select class="form-select" name="funcao[]">
+                      <option value="">Selecione...</option>
+                      <option>Soldador</option>
+                      <option>Encanador</option>
+                      <option>Caldeireiro</option>
+                      <option>Mecânico</option>
+                      <option>Eletrícista</option>
+                      <option>Auxiliar</option>
+                      <option>Almoxarife</option>
+                      <option>Técnico de Segurança</option>
+                      <option>Encarregado</option>
+                      <option>Administrativo</option>
+                      <option>Inspetor</option>
+                      <option>Planejador</option>
+                      <option>Supervisor</option>
+                      <option>Coordenador</option>
+                    </select>
+                  </div>
+                  <div class="col-lg-4">
+                    <label class="form-label">Horário de Trabalho</label>
+                    <div class="d-flex gap-2">
+                      <input class="form-control" type="time" name="entrada[]" />
+                      <input class="form-control" type="time" name="saida[]" />
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-2 text-end">
+                  <button type="button" class="btn btn-sm btn-outline-danger remove-item"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tab-pane fade" id="step-fotos" role="tabpanel">
+          <div class="panel">
+            <div class="d-flex align-items-center justify-content-between">
+              <h5>Anexos de fotos</h5>
+              <button id="add-foto" type="button" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-plus me-1"></i>Adicionar</button>
+            </div>
+            <div id="fotos-container" class="row g-3 mt-1">
+              <div class="col-md-4">
+                <div class="thumb"><span class="text-muted">Pré-visualização</span></div>
+                <input class="form-control foto-input" type="file" accept="image/*" />
+                <input class="form-control form-control-sm mt-2 foto-legenda" placeholder="Legenda da foto" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tab-pane fade" id="step-obs" role="tabpanel">
+          <div class="panel">
+            <h5>Observações</h5>
+            <textarea id="observacoes" name="observacoes" rows="6" class="form-control" placeholder="Texto livre (opcional)"></textarea>
+          </div>
+        </section>
+
+        <section class="tab-pane fade" id="step-revisao" role="tabpanel">
+          <div class="panel">
+            <h5>Revisão rápida</h5>
+            <p class="muted">Use os botões flutuantes para visualizar/imprimir. A assinatura sai fixa no rodapé de todas as páginas do PDF.</p>
+            <div id="resumo" class="small"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="fab">
+    <button id="previewBtn" class="btn btn-outline-dark" title="Pré-visualizar"><i class="fa-solid fa-eye"></i></button>
+    <button id="clearAllFloat" class="btn btn-outline-danger" title="Limpar tudo"><i class="fa-solid fa-trash"></i></button>
+    <button id="submitBtn" class="btn btn-primary" title="Salvar e exportar"><i class="fa-solid fa-save"></i></button>
+  </div>
+
+  <footer class="text-center small">RDO &copy; 2025 – Thaynison Couto</footer>
+
+  <div id="pdf-container"></div>
+
+  <div class="modal fade" id="confirmClearModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h6 class="modal-title"><i class="fa-solid fa-triangle-exclamation me-1"></i> Confirmar limpeza</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">Deseja limpar todos os dados? Esta ação não poderá ser desfeita.</div>
+        <div class="modal-footer">
+          <button id="confirmClearBtn" type="button" class="btn btn-danger">Sim, limpar</button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Bootstrap & jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const empresasData = {
-            "empresas": [
-                {
-                    "nome": "Suzano Aracruz",
-                    "unidades": [
-                        "Pátio de Madeira",
-                        "Caldeira de Recuperação",
-                        "Caustificação",
-                        "Evaporação",
-                        "Estação de Tratamento Água",
-                        "Estação de Tratamento Esgoto",
-                        "Linha de Fibras",
-                        "Secagem",
-                        "Oficina Central"
-                    ],
-                    "obras": [
-                        { "nome": "PP LINHA 4", "pc": "4502169545" },
-                        { "nome": "PP LINHA 5", "pc": "4502169545" },
-                        { "nome": "TANQUE LBS", "pc": "4502224736" },
-                        { "nome": "PG SECAGEM B", "pc": "4502223947" },
-                        { "nome": "ATENDIMENTO AO BRANQUEAMENTO - LUCAS", "pc": "4502239784" },
-                        { "nome": "ATENDIMENTO AO BRANQUEAMENTO - GUILHERME", "pc": "4502239788" },
-                        { "nome": "FORNECIMENTO DE PLANEJADOR - FELIPE", "pc": "4502204259" }
-                    ]
-                },
-                {
-                    "nome": "Suzano Mucuri",
-                    "unidades": [
-                        "Pátio de Madeira",
-                        "Caldeira de Recuperação",
-                        "Caustificação",
-                        "Evaporação",
-                        "Estação de Tratamento Água",
-                        "Estação de Tratamento Esgoto",
-                        "Linha de Fibras",
-                        "Secagem",
-                        "Oficina Central"   
-                    ],
-                    "obras": [
-                        { "nome": "*", "pc": "*" }
-                    ]
-                },
-                {
-                    "nome": "CGH João Neiva",
-                    "unidades": [
-                        "CGH"
-                    ],
-                    "obras": [
-                        { "nome": "*", "pc": "*" },
-                    ]
-                }
-            ]
-        };
-        
-        $(document).ready(function() {
-            // Inicializar toast
-            const toastEl = document.getElementById('liveToast');
-            const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-            
-            function showToast(message, type = 'success') {
-                $('.toast-body').text(message);
-                $('.toast').removeClass('bg-success bg-danger');
-                
-                if (type === 'error') {
-                    $('.toast').addClass('bg-danger text-white');
-                } else {
-                    $('.toast').addClass('bg-success text-white');
-                }
-                
-                toast.show();
+  <div class="position-fixed top-0 end-0 p-3" style="z-index:1080">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">RDO</strong>
+        <small>Agora</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Fechar"></button>
+      </div>
+      <div class="toast-body"></div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const empresasData = { empresas:[ { nome:"Suzano Aracruz", unidades:["Pátio de Madeira","Caldeira de Recuperação","Caustificação","Evaporação","Estação de Tratamento Água","Estação de Tratamento Esgoto","Linha de Fibras","Secagem","Oficina Central"], obras:[ {nome:"PP LINHA 4", pc:"4502169545"}, {nome:"PP LINHA 5", pc:"4502169545"}, {nome:"TANQUE LBS", pc:"4502224736"}, {nome:"PG SECAGEM B", pc:"4502223947"}, {nome:"ATENDIMENTO AO BRANQUEAMENTO - LUCAS", pc:"4502239784"}, {nome:"ATENDIMENTO AO BRANQUEAMENTO - GUILHERME", pc:"4502239788"}, {nome:"FORNECIMENTO DE PLANEJADOR - FELIPE", pc:"4502204259"} ] }, { nome:"Suzano Mucuri", unidades:["Pátio de Madeira","Caldeira de Recuperação","Caustificação","Evaporação","Estação de Tratamento Água","Estação de Tratamento Esgoto","Linha de Fibras","Secagem","Oficina Central"], obras:[{nome:"*", pc:"*"}] }, { nome:"CGH João Neiva", unidades:["CGH"], obras:[{nome:"*", pc:"*"}] } ] };
+
+    const toast = new bootstrap.Toast(document.getElementById('liveToast'), {delay:3000});
+    function showToast(msg, type='success'){
+      const el = $('#liveToast');
+      el.removeClass('bg-success bg-danger text-white');
+      if(type==='error') el.addClass('bg-danger text-white'); else el.addClass('bg-success text-white');
+      el.find('.toast-body').text(msg); toast.show();
+    }
+    function setToday(){ const today = new Date().toISOString().split('T')[0]; $('#data').val(today); }
+    function populateEmpresas(){ const $sel = $('#empresa'); $sel.empty().append('<option value="">Selecione o cliente...</option>'); empresasData.empresas.forEach(e=>$sel.append(new Option(e.nome,e.nome))); }
+    function populateAreas(nome){ const $sel = $('#area'); $sel.empty().append('<option value="">Selecione a área...</option>'); const emp = empresasData.empresas.find(e=>e.nome===nome); if(emp) emp.unidades.forEach(u=>$sel.append(new Option(u,u))); }
+    function populateObras(nome){ const $sel = $('#obra'); $sel.empty().append('<option value="">Selecione a obra...</option>'); $('#obraPc').val(''); const emp = empresasData.empresas.find(e=>e.nome===nome); if(emp) emp.obras.forEach(o=>$('<option>').val(o.nome).text(o.nome).attr('data-pc',o.pc).appendTo($sel)); }
+    function updateProgress(){ const requiredIds = ['empresa','obra','data','turno','encarregado','area','clima']; const filled = requiredIds.filter(id=>$('#'+id).val()).length; const pct = Math.round((filled/requiredIds.length)*100); $('#progressBar').css('width', pct+'%').css('background', pct<30?'#ef4444':(pct<70?'#f59e0b':'#16a34a')); }
+    function getClimaDescription(val){ const map={ensolarado:'Ensolarado',nublado:'Nublado',chuvoso:'Chuvoso',tempestuoso:'Tempestuoso'}; return map[val]||'Não especificado'; }
+    function readFileAsDataURL(file){ return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);}); }
+    function collectFormData(){ const formData={ obra:$('#obra').val(), data:$('#data').val(), turno:$('#turno').val(), encarregado:$('#encarregado').val(), empresa:$('#empresa').val(), area:$('#area').val(), clima:$('#clima').val(), atividades:[], observacoes:$('#observacoes').val(), equipe:[], fotos:[]}; $("textarea[name='atividade[]']").each(function(){const v=$(this).val().trim(); if(v) formData.atividades.push(v);}); $('#equipe-container .chip').each(function(){ const nome=$(this).find("input[name='funcionario[]']").val(); const funcao=$(this).find("select[name='funcao[]']").val(); const entrada=$(this).find("input[name='entrada[]']").val(); const saida=$(this).find("input[name='saida[]']").val(); if(nome) formData.equipe.push({nome:nome.trim(),funcao,entrada,saida}); }); return formData; }
+
+    // Heurística simples para inserir quebras de página entre seções longas
+    function maybePageBreakAfterActivities(len){
+      return len >= 18 ? '<div class="page-break"></div>' : '';
+    }
+    function maybePageBreakBeforePhotos(teamLen, fotoLen){
+      return (teamLen >= 12 || fotoLen > 6) ? '<div class="page-break"></div>' : '';
+    }
+
+    async function generatePDF(formData, isPreview=false){
+      let pdf = '';
+      pdf += `<div class="pdf-content">`;
+      pdf += `  <div class="pdf-header">`+
+             `    <div><h1 class="pdf-h-title">Registro Diário de Obra - RDO</h1><div>Documento de registro das atividades</div></div>`+
+             `  </div>`;
+
+      pdf += `<div class="pdf-info">`+
+             `  <div class="pdf-grid">`+
+             `    <div class="pdf-col"><div class="pdf-label">Cliente</div><div>${formData.empresa||'Não informado'}</div></div>`+
+             `    <div class="pdf-col"><div class="pdf-label">Serviço</div><div>${formData.obra||'Não informado'}</div></div>`+
+             `    <div class="pdf-col"><div class="pdf-label">Nº do Pedido (PC)</div><div>${$('#obraPc').val()||'Não informado'}</div></div>`+
+             `  </div>`+
+             `  <div class="pdf-grid">`+
+             `    <div class="pdf-col"><div class="pdf-label">Data</div><div>${formData.data?formData.data.split('-').reverse().join('/'):'Não informado'}</div></div>`+
+             `    <div class="pdf-col"><div class="pdf-label">Turno</div><div>${$('#turno option:selected').text()||'Não informado'}</div></div>`+
+             `    <div class="pdf-col"><div class="pdf-label">Encarregado</div><div>${formData.encarregado||'Não informado'}</div></div>`+
+             `  </div>`+
+             `  <div class="pdf-grid">`+
+             `    <div class="pdf-col"><div class="pdf-label">Área/Unidade</div><div>${formData.area||'Não informado'}</div></div>`+
+             `    <div class="pdf-col"><div class="pdf-label">Condições Climáticas</div><div>${getClimaDescription(formData.clima)}</div></div>`+
+             `    <div class="pdf-col"><div class="pdf-label">Emissão</div><div>${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}</div></div>`+
+             `  </div>`+
+             `</div>`;
+
+      // Atividades
+      if(formData.atividades?.length){
+        pdf += `<div class="pdf-section avoid-break"><div class="pdf-section-title">Atividades Realizadas</div><ol>`;
+        formData.atividades.forEach(a=>pdf += `<li>${a}</li>`);
+        pdf += `</ol></div>`;
+        pdf += maybePageBreakAfterActivities(formData.atividades.length);
+      } else if(isPreview){
+        pdf += `<div class="pdf-section avoid-break"><div class="pdf-section-title">Atividades Realizadas</div><p><em>Exemplo de visualização</em></p><ol><li>Instalação de tubulação</li><li>Manutenção preventiva</li><li>Substituição de válvulas</li></ol></div>`;
+      }
+
+      if(formData.observacoes && formData.observacoes.trim()){
+        pdf += `<div class="pdf-section avoid-break"><div class="pdf-section-title">Observações</div><p>${formData.observacoes}</p></div>`;
+      }
+
+      // Equipe
+      if(formData.equipe?.length){
+        pdf += `<div class="pdf-section"><div class="pdf-section-title">Equipe</div>`+
+               `<table class="pdf-table"><thead><tr><th>Nome</th><th>Função</th><th>Entrada</th><th>Saída</th></tr></thead><tbody>`;
+        formData.equipe.forEach(m=>{ pdf += `<tr><td>${m.nome||''}</td><td>${m.funcao||''}</td><td>${m.entrada||''}</td><td>${m.saida||''}</td></tr>`; });
+        pdf += `</tbody></table></div>`;
+      }
+
+      // Fotos
+      const photoCount = (window.__photos?.length||0);
+      if(photoCount){
+        pdf += maybePageBreakBeforePhotos(formData.equipe?.length||0, photoCount);
+        pdf += `<div class="pdf-section"><div class="pdf-section-title">Anexos de Fotos</div><div class="pdf-imggrid">`;
+        window.__photos.forEach((f,i)=>{
+          if(f?.dataUrl){
+            pdf += `<div class="pdf-imgwrap"><div class="pdf-imgbox"><img src="${f.dataUrl}" alt="Foto ${i+1}"></div><div class="pdf-caption">${f.legenda||('Foto '+(i+1))}</div></div>`;
+            // quebra a cada 6 fotos para melhor distribuição
+            if(((i+1) % 6) === 0 && (i+1) < photoCount){
+              pdf += `</div></div><div class="page-break"></div><div class="pdf-section"><div class="pdf-section-title">Anexos de Fotos (cont.)</div><div class="pdf-imggrid">`;
             }
-
-            // Preencher select de empresas
-            function populateEmpresas() {
-                const empresaSelect = $('#empresa');
-                empresaSelect.empty().append('<option value="">Selecione o cliente...</option>');
-                
-                empresasData.empresas.forEach(empresa => {
-                    empresaSelect.append($('<option>', {
-                        value: empresa.nome,
-                        text: empresa.nome
-                    }));
-                });
-            }
-            
-            // Preencher select de áreas baseado na empresa selecionada
-            function populateAreas(empresaNome) {
-                const areaSelect = $('#area');
-                areaSelect.empty().append('<option value="">Selecione a área...</option>');
-                
-                if (empresaNome) {
-                    const empresa = empresasData.empresas.find(e => e.nome === empresaNome);
-                    if (empresa && empresa.unidades) {
-                        empresa.unidades.forEach(unidade => {
-                            areaSelect.append($('<option>', {
-                                value: unidade,
-                                text: unidade
-                            }));
-                        });
-                    }
-                }
-            }
-            
-            // Preencher select de obras baseado na empresa selecionada
-            function populateObras(empresaNome) {
-                const obraSelect = $('#obra');
-                obraSelect.empty().append('<option value="">Selecione a obra...</option>');
-                $('#obraPc').val(''); // Limpar o campo do PC
-                
-                if (empresaNome) {
-                    const empresa = empresasData.empresas.find(e => e.nome === empresaNome);
-                    if (empresa && empresa.obras) {
-                        empresa.obras.forEach(obra => {
-                            obraSelect.append($('<option>', {
-                                value: obra.nome,
-                                text: obra.nome,
-                                'data-pc': obra.pc
-                            }));
-                        });
-                    }
-                }
-            }
-            
-            // Evento quando a empresa é alterada
-            $('#empresa').change(function() {
-                const empresaSelecionada = $(this).val();
-                populateAreas(empresaSelecionada);
-                populateObras(empresaSelecionada);
-                updateProgress();
-            });
-            
-            // Evento quando a obra é alterada
-            $('#obra').change(function() {
-                const obraSelecionada = $(this).find('option:selected');
-                const pcValue = obraSelecionada.data('pc') || '';
-                $('#obraPc').val(pcValue);
-                updateProgress();
-            });
-
-            // Definir data atual como padrão
-            const today = new Date().toISOString().split('T')[0];
-            $("#data").val(today);
-            
-            // Preencher empresas ao carregar a página
-            populateEmpresas();
-            
-            // Atualizar barra de progresso
-            function updateProgress() {
-                const totalFields = 17;
-                let filledFields = 0;
-                
-                // Verificar campos obrigatórios
-                $("#rdoForm input[required], #rdoForm select[required], #rdoForm textarea[required]").each(function() {
-                    if ($(this).val() !== '') {
-                        filledFields++;
-                    }
-                });
-                
-                // Calcular porcentagem
-                const percentage = (filledFields / totalFields) * 100;
-                $("#form-progress").css('width', percentage + '%');
-                
-                // Mudar cor baseada na porcentagem
-                if (percentage < 30) {
-                    $("#form-progress").css('background-color', '#e74c3c');
-                } else if (percentage < 70) {
-                    $("#form-progress").css('background-color', '#f39c12');
-                } else {
-                    $("#form-progress").css('background-color', '#27ae60');
-                }
-            }
-            
-            // Atualizar progresso quando os campos mudam
-            $("#rdoForm input, #rdoForm select, #rdoForm textarea").on('input change', updateProgress);
-            
-            // Inicializar progresso
-            updateProgress();
-            
-            // Seleção de condições climáticas
-            $(".clima-option").click(function() {
-                $(".clima-option").removeClass("selected");
-                $(this).addClass("selected");
-                $("#clima").val($(this).data("clima"));
-                updateProgress();
-            });
-            
-            // Adicionar nova atividade
-            $("#add-atividade").click(function() {
-                $("#atividades-container").append(`
-                    <div class="function-item">
-                        <div class="mb-3">
-                            <label class="form-label">Descrição da Atividade</label>
-                            <textarea class="form-control" name="atividade[]" rows="3" required placeholder="Descreva detalhadamente a atividade realizada..."></textarea>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-danger remove-item">
-                            <i class="fas fa-trash me-1"></i>Remover
-                        </button>
-                    </div>
-                `);
-            });
-
-            // Adicionar novo funcionário
-            $("#add-funcionario").click(function() {
-                $("#equipe-container").append(`
-                    <div class="function-item">
-                        <div class="row">
-                            <div class="col-md-5 mb-3">
-                                <label class="form-label">Nome do Funcionário</label>
-                                <input type="text" class="form-control" name="funcionario[]" required>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Função</label>
-                                <select class="form-select" name="funcao[]">
-                                    <option value="">Selecione...</option>
-                                    <option value="Soldador">Soldador</option>
-                                    <option value="Encanador">Encanador</option>
-                                    <option value="Caldeireiro">Caldeireiro</option>
-                                    <option value="Mecânico">Mecânico</option>
-                                    <option value="Eletrícista">Eletrícista</option>
-                                    <option value="Auxiliar">Auxiliar</option>
-                                    <option value="Almoxarife">Almoxarife</option>
-                                    <option value="Técnico de Segurança">Técnico de Segurança</option>
-                                    <option value="Encarregado">Encarregado</option>
-                                    <option value="Administrativo">Administrativo</option>
-                                    <option value="Inspetor">Inspetor</option>
-                                    <option value="Planejador">Planejador</option>
-                                    <option value="Supervisor">Supervisor</option>
-                                    <option value="Coordenador">Coordenador</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Horário de Trabalho</label>
-                                <div class="time-inputs">
-                                    <input type="time" class="form-control" name="entrada[]">
-                                    <input type="time" class="form-control" name="saida[]">
-                                </div>
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-danger remove-item">
-                            <i class="fas fa-trash me-1"></i>Remover
-                        </button>
-                    </div>
-                `);
-            });
-
-            // Adicionar mais fotos
-            $("#add-foto").click(function() {
-                $("#fotos-container").append(`
-                    <div class="col-md-4 mb-3">
-                        <div class="image-preview">
-                            <span class="text-muted">Pré-visualização da imagem</span>
-                        </div>
-                        <input type="file" class="form-control foto-input" accept="image/*">
-                        <div class="mt-2">
-                            <input type="text" class="form-control form-control-sm foto-legenda" placeholder="Legenda da foto">
-                        </div>
-                    </div>
-                `);
-            });
-
-            // Remover itens
-            $(document).on("click", ".remove-item", function() {
-                $(this).closest(".function-item").remove();
-            });
-
-            // Preview de imagem
-            $(document).on("change", ".foto-input", function(e) {
-                const previewDiv = $(this).prev(".image-preview");
-                const file = e.target.files[0];
-                
-                if (file) {
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        previewDiv.html(`<img src="${e.target.result}" alt="Preview">`);
-                    }
-                    
-                    reader.readAsDataURL(file);
-                } else {
-                    previewDiv.html('<span class="text-muted">Pré-visualização da imagem</span>');
-                }
-            });
-
-            // Abrir modal em vez de confirm()
-            $("#clearAllFloat").click(function() {
-                $("#confirmClearModal").modal("show");
-            });
-
-            // Se clicar em confirmar
-            $("#confirmClearBtn").click(function() {
-                $("#confirmClearModal").modal("hide");
-
-                // --- Aqui vai a mesma lógica que você já tinha ---
-                $("#rdoForm")[0].reset();
-                $(".image-preview").html('<span class="text-muted">Pré-visualização da imagem</span>');
-                $(".clima-option").removeClass("selected");
-                $("#atividades-container, #equipe-container").html(`
-                    <div class="function-item">
-                        <div class="mb-3">
-                            <label class="form-label">Descrição da Atividade</label>
-                            <textarea class="form-control" name="atividade[]" rows="3" required placeholder="Descreva detalhadamente a atividade realizada..."></textarea>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-danger remove-item">
-                            <i class="fas fa-trash me-1"></i>Remover
-                        </button>
-                    </div>
-                `);
-                $("#fotos-container").html(`
-                    <div class="col-md-4 mb-3">
-                        <div class="image-preview">
-                            <span class="text-muted">Pré-visualização da imagem</span>
-                        </div>
-                        <input type="file" class="form-control foto-input" accept="image/*">
-                        <div class="mt-2">
-                            <input type="text" class="form-control form-control-sm foto-legenda" placeholder="Legenda da foto">
-                        </div>
-                    </div>
-                `);
-                populateEmpresas();
-                updateProgress();
-                showToast("Formulário limpo com sucesso!", "success");
-            });
-
-            // Função para gerar o PDF
-            async function generatePDF(formData, isPreview = false) {
-                console.log("Iniciando geração do PDF...");
-                
-                try {
-                    // Construir o conteúdo do PDF
-                    let pdfContent = `
-                        <div class="pdf-content">
-                            <div class="pdf-header">
-                                <div class="pdf-logo">
-                                    <img src="logo.png" alt="Logo RDO">
-                                </div>
-                                <div class="pdf-header-content">
-                                    <h1>Registro Diário de Obra - RDO</h1>
-                                    <p>Documento de registro das atividades realizadas</p>
-                                </div>
-                            </div>
-                            
-                            <div class="pdf-info-box">
-                                <div class="pdf-info-row">
-                                    <div class="pdf-info-item">
-                                        <div class="pdf-info-label">Cliente</div>
-                                        <div>${formData.empresa || 'Não informado'}</div>
-                                    </div>
-                                    <div class="pdf-info-item">
-                                        <div class="pdf-info-label">Serviço</div>
-                                        <div>${formData.obra || 'Não informado'}</div>
-                                    </div>
-                                    <div class="pdf-info-item">
-                                        <div class="pdf-info-label">Nº do Pedido (PC)</div>
-                                        <div>${$("#obraPc").val() || 'Não informado'}</div>
-                                    </div>
-                                </div>
-                                <div class="pdf-info-row">
-                                    <div class="pdf-info-item">
-                                        <div class="pdf-info-label">Data</div>
-                                        <div>${formData.data ? formData.data.split("-").reverse().join("/") : 'Não informado'}</div>
-                                    </div>
-                                    <div class="pdf-info-item">
-                                        <div class="pdf-info-label">Turno</div>
-                                        <div>${$("#turno option:selected").text() || 'Não informado'}</div>
-                                    </div>
-                                    <div class="pdf-info-item">
-                                        <div class="pdf-info-label">Encarregado</div>
-                                        <div>${formData.encarregado || 'Não informado'}</div>
-                                    </div>
-                                </div>
-                                <div class="pdf-info-row">
-                                    <div class="pdf-info-item">
-                                        <div class="pdf-info-label">Área/Unidade</div>
-                                        <div>${formData.area || 'Não informado'}</div>
-                                    </div>
-                                    <div class="pdf-info-item">
-                                        <div class="pdf-info-label">Condições Climáticas</div>
-                                        <div>${getClimaDescription(formData.clima)}</div>
-                                    </div>
-                                    <div class="pdf-info-item">
-                                        <div class="pdf-info-label">Data de Emissão</div>
-                                        <div>${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</div>
-                                    </div>
-                                </div>
-                            </div>
-                    `;
-                    
-                    // Adicionar atividades
-                    if (formData.atividades && formData.atividades.length > 0) {
-                        pdfContent += `
-                            <div class="pdf-section avoid-break">
-                                <div class="pdf-section-title">Atividades Realizadas</div>
-                                <ol>
-                        `;
-                        
-                        formData.atividades.forEach(atividade => {
-                            pdfContent += `<li>${atividade || 'Atividade não descrita'}</li>`;
-                        });
-                        
-                        pdfContent += `
-                                </ol>
-                            </div>
-                        `;
-                    } else if (isPreview) {
-                        pdfContent += `
-                            <div class="pdf-section avoid-break">
-                                <div class="pdf-section-title">Atividades Realizadas</div>
-                                <p><em>Nenhuma atividade registrada - esta é uma visualização de exemplo</em></p>
-                                <ol>
-                                    <li>Instalação de tubulação na área de evaporação</li>
-                                    <li>Manutenção preventiva em bombas centrífugas</li>
-                                    <li>Substituição de válvulas no setor de caldeira</li>
-                                </ol>
-                            </div>
-                        `;
-                    }
-                    
-                    // Adicionar equipe
-                    if (formData.equipe && formData.equipe.length > 0) {
-                        pdfContent += `
-                            <div class="pdf-section avoid-break">
-                                <div class="pdf-section-title">Equipe</div>
-                                <table class="pdf-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Nome</th>
-                                            <th>Função</th>
-                                            <th>Entrada</th>
-                                            <th>Saída</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                        `;
-                        
-                        formData.equipe.forEach(membro => {
-                            pdfContent += `
-                                <tr>
-                                    <td>${membro.nome || ''}</td>
-                                    <td>${membro.funcao || ''}</td>
-                                    <td>${membro.entrada || ''}</td>
-                                    <td>${membro.saida || ''}</td>
-                                </tr>
-                            `;
-                        });
-                        
-                        pdfContent += `
-                                    </tbody>
-                                </table>
-                            </div>
-                        `;
-                    } else if (isPreview) {
-                        pdfContent += `
-                            <div class="pdf-section avoid-break">
-                                <div class="pdf-section-title">Equipe</div>
-                                <p><em>Nenhum funcionário registrado - esta é uma visualização de exemplo</em></p>
-                                <table class="pdf-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Nome</th>
-                                            <th>Função</th>
-                                            <th>Entrada</th>
-                                            <th>Saída</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>João da Silva</td>
-                                            <td>Soldador</td>
-                                            <td>07:30</td>
-                                            <td>16:30</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Maria Oliveira</td>
-                                            <td>Caldeireiro</td>
-                                            <td>07:30</td>
-                                            <td>16:30</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Pedro Santos</td>
-                                            <td>Auxiliar</td>
-                                            <td>07:30</td>
-                                            <td>16:30</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        `;
-                    }
-                    
-                    // Adicionar fotos
-                    if (formData.fotos && formData.fotos.length > 0) {
-                        pdfContent += `
-                            <div class="pdf-section avoid-break">
-                                <div class="pdf-section-title">Anexos de Fotos</div>
-                                <div class="pdf-images-grid">
-                        `;
-                        
-                        for (let i = 0; i < formData.fotos.length; i++) {
-                            const foto = formData.fotos[i];
-                            if (foto.dataUrl) {
-                                pdfContent += `
-                                    <div class="pdf-image-wrapper">
-                                        <div class="pdf-image-box">
-                                            <img src="${foto.dataUrl}" alt="Foto ${i+1}">
-                                        </div>
-                                        <div class="pdf-image-caption">${foto.legenda || `Foto ${i+1}`}</div>
-                                    </div>
-                                `;
-                            }
-                        }
-                        
-                        pdfContent += `
-                                </div>
-                            </div>
-                        `;
-                    } else if (isPreview) {
-                        pdfContent += `
-                            <div class="pdf-section avoid-break">
-                                <div class="pdf-section-title">Anexos de Fotos</div>
-                                <p><em>Nenhuma foto anexada - esta é uma visualização de exemplo</em></p>
-                            </div>
-                        `;
-                    }
-                    
-                    pdfContent += `</div>`; // Fechar div.pdf-content
-                    
-                    // Adicionar seção de assinaturas
-                    pdfContent += `
-                        <div class="signature-section avoid-break">
-                            <div class="signature-title">ASSINATURAS</div>
-                            <div class="signature-grid">
-                                <div class="signature-box">
-                                    <div class="signature-line"></div>
-                                    <div class="signature-name">Supervisão</div>
-                                    <div class="signature-role">Responsável pela supervisão</div>
-                                </div>
-                                <div class="signature-box">
-                                    <div class="signature-line"></div>
-                                    <div class="signature-name">Planejamento</div>
-                                    <div class="signature-role">Responsável pelo planejamento</div>
-                                </div>
-                                <div class="signature-box">
-                                    <div class="signature-line"></div>
-                                    <div class="signature-name">Resp. Contratante</div>
-                                    <div class="signature-role">Responsável pelo contratante</div>
-                                </div>
-                                <div class="signature-box">
-                                    <div class="signature-line"></div>
-                                    <div class="signature-name">Resp. Contratante</div>
-                                    <div class="signature-role">Responsável pelo contratante</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Inserir o conteúdo no container do PDF
-                    $("#pdf-container").html(pdfContent);
-                    console.log("Conteúdo do PDF gerado com sucesso");
-                    
-                    // Aguardar um momento para garantir que as imagens são carregadas
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    
-                    // Acionar a impressão
-                    window.print();
-                    
-                    setTimeout(() => {
-                        showToast("PDF gerado com sucesso! Use a opção 'Salvar como PDF' na janela de impressão.", "success");
-                        console.log("PDF pronto para impressão/salvamento");
-                    }, 1000);
-                    
-                } catch (error) {
-                    console.error("Erro ao gerar PDF:", error);
-                    showToast("Erro ao gerar PDF. Verifique o console para detalhes.", "error");
-                }
-            }
-            
-            // Função auxiliar para obter descrição do clima
-            function getClimaDescription(clima) {
-                const climas = {
-                    'ensolarado': 'Ensolarado',
-                    'nublado': 'Nublado',
-                    'chuvoso': 'Chuvoso',
-                    'tempestuoso': 'Tempestuoso'
-                };
-                return climas[clima] || 'Não especificado';
-            }
-            
-            // Função para ler arquivo como Data URL (base64)
-            function readFileAsDataURL(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            }
-            
-            // Coletar dados do formulário
-            function collectFormData() {
-                const formData = {
-                    obra: $("#obra").val(),
-                    data: $("#data").val(),
-                    turno: $("#turno").val(),
-                    encarregado: $("#encarregado").val(),
-                    empresa: $("#empresa").val(),
-                    area: $("#area").val(),
-                    clima: $("#clima").val(),
-                    atividades: [],
-                    equipe: [],
-                    fotos: []
-                };
-                
-                // Coletar atividades
-                $("textarea[name='atividade[]']").each(function() {
-                    if ($(this).val().trim() !== '') {
-                        formData.atividades.push($(this).val().trim());
-                    }
-                });
-                
-                // Coletar equipe
-                $(".function-item", "#equipe-container").each(function() {
-                    const nome = $("input[name='funcionario[]']", this).val();
-                    const funcao = $("select[name='funcao[]']", this).val();
-                    const entrada = $("input[name='entrada[]']", this).val();
-                    const saida = $("input[name='saida[]']", this).val();
-                    
-                    if (nome) {
-                        formData.equipe.push({
-                            nome: nome.trim(),
-                            funcao: funcao,
-                            entrada: entrada,
-                            saida: saida
-                        });
-                    }
-                });
-                
-                return formData;
-            }
-            
-            // Processar envio do formulário
-            $("#submitBtn").click(async function() {
-                console.log("Formulário submetido. Iniciando coleta de dados...");
-                
-                // Validar formulário
-                if (!$("#rdoForm")[0].checkValidity()) {
-                    $("#rdoForm")[0].reportValidity();
-                    showToast("Preencha todos os campos obrigatórios!", "error");
-                    return;
-                }
-                
-                // Coletar dados do formulário
-                const formData = collectFormData();
-                
-                // Coletar fotos
-                const fotoInputs = $(".foto-input");
-                console.log(`Encontradas ${fotoInputs.length} entradas de foto`);
-                
-                for (let i = 0; i < fotoInputs.length; i++) {
-                    const input = fotoInputs[i];
-                    const file = input.files[0];
-                    
-                    if (file) {
-                        try {
-                            console.log(`Processando foto ${i+1}: ${file.name}`);
-                            const dataUrl = await readFileAsDataURL(file);
-                            const legenda = $(input).siblings('.mt-2').find('.foto-legenda').val();
-                            
-                            formData.fotos.push({
-                                dataUrl: dataUrl,
-                                legenda: legenda
-                            });
-                            
-                            console.log(`Foto ${i+1} processada com sucesso`);
-                        } catch (error) {
-                            console.error(`Erro ao processar foto ${i+1}:`, error);
-                        }
-                    }
-                }
-                
-                console.log("Todos os dados coletados. Iniciando geração do PDF...");
-                
-                // Gerar PDF
-                await generatePDF(formData);
-            });
-            
-            $("#previewBtn").click(async function() {
-                console.log("Visualização de impressão solicitada...");                
-                const formData = collectFormData();                
-                if (!formData.empresa) formData.empresa = "Suzano Aracruz";
-                if (!formData.obra) formData.obra = "PP LINHA 5";
-                if (!formData.data) formData.data = today;
-                if (!formData.encarregado) formData.encarregado = "MARCIO WESLEY FANCHIOTI";
-                if (!formData.area) formData.area = "Caldeira de Recuperação";
-                if (!formData.clima) formData.clima = "ensolarado";
-                await generatePDF(formData, true);
-            });
+          }
         });
-    </script>
+        pdf += `</div></div>`;
+      }
+
+      pdf += `</div>`; // fecha pdf-content
+
+      // Rodapé de assinaturas fixo
+      pdf += `<div class="signature-section">`+
+             `  <div class="signature-title">ASSINATURAS</div>`+
+             `  <div class="signature-grid">`+
+             `    <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Supervisão</div><div class="signature-role">Responsável pela supervisão</div></div>`+
+             `    <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Planejamento</div><div class="signature-role">Responsável pelo planejamento</div></div>`+
+             `    <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Resp. Contratante</div><div class="signature-role">Responsável pelo contratante</div></div>`+
+             `    <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Resp. Contratante</div><div class="signature-role">Responsável pelo contratante</div></div>`+
+             `  </div>`+
+             `</div>`;
+
+      $('#pdf-container').html(pdf);
+      await new Promise(r=>setTimeout(r,350));
+      window.print();
+    }
+
+    $(function(){
+      populateEmpresas(); setToday(); updateProgress();
+
+      $('#empresa').on('change', function(){ const v=$(this).val(); populateAreas(v); populateObras(v); updateProgress(); });
+      $('#obra').on('change', function(){ const pc=$(this).find('option:selected').data('pc')||''; $('#obraPc').val(pc); updateProgress(); });
+
+      $('.clima').on('click', function(){ $('.clima').removeClass('active'); $(this).addClass('active'); $('#clima').val($(this).data('clima')); updateProgress(); });
+
+      $('#data,#turno,#encarregado,#area').on('change', updateProgress);
+
+      // Delegated handler
+      $(document).on('click','#add-atividade', function(){
+        $('#atividades-container').append(`
+          <div class="chip">
+            <label class="form-label">Descrição da atividade</label>
+            <textarea class="form-control" name="atividade[]" rows="3" required placeholder="Descreva detalhadamente a atividade realizada..."></textarea>
+            <div class="mt-2 text-end">
+              <button type="button" class="btn btn-sm btn-outline-danger remove-item"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>`);
+      });
+      $(document).on('click','#add-funcionario', function(){
+        $('#equipe-container').append(`
+          <div class="chip">
+            <div class="row g-3 align-items-end">
+              <div class="col-lg-5">
+                <label class="form-label">Nome do Funcionário</label>
+                <input type="text" class="form-control" name="funcionario[]" required />
+              </div>
+              <div class="col-lg-3">
+                <label class="form-label">Função</label>
+                <select class="form-select" name="funcao[]">
+                  <option value="">Selecione...</option>
+                  <option>Soldador</option><option>Encanador</option><option>Caldeireiro</option>
+                  <option>Mecânico</option><option>Eletrícista</option><option>Auxiliar</option>
+                  <option>Almoxarife</option><option>Técnico de Segurança</option><option>Encarregado</option>
+                  <option>Administrativo</option><option>Inspetor</option><option>Planejador</option>
+                  <option>Supervisor</option><option>Coordenador</option>
+                </select>
+              </div>
+              <div class="col-lg-4">
+                <label class="form-label">Horário de Trabalho</label>
+                <div class="d-flex gap-2">
+                  <input class="form-control" type="time" name="entrada[]" />
+                  <input class="form-control" type="time" name="saida[]" />
+                </div>
+              </div>
+            </div>
+            <div class="mt-2 text-end">
+              <button type="button" class="btn btn-sm btn-outline-danger remove-item"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>`);
+      });
+      $(document).on('click','.remove-item', function(){ $(this).closest('.chip').remove(); });
+
+      $(document).on('click','#add-foto', function(){
+        $('#fotos-container').append(`
+          <div class="col-md-4">
+            <div class="thumb"><span class="text-muted">Pré-visualização</span></div>
+            <input class="form-control foto-input" type="file" accept="image/*" />
+            <input class="form-control form-control-sm mt-2 foto-legenda" placeholder="Legenda da foto" />
+          </div>`);
+      });
+      $(document).on('change','.foto-input', function(e){
+        const file=e.target.files?.[0];
+        const $wrap=$(this).closest('.col-md-4');
+        const $thumb=$wrap.find('.thumb');
+        if(file){ const r=new FileReader(); r.onload=ev=>$thumb.html(`<img src="${ev.target.result}">`); r.readAsDataURL(file);} else {$thumb.html('<span class="text-muted">Pré-visualização</span>');}
+      });
+
+      $('#clearAllFloat').on('click', ()=>$('#confirmClearModal').modal('show'));
+      $('#confirmClearBtn').on('click', function(){ $('#confirmClearModal').modal('hide');
+        $('select, input, textarea').val(''); $('.clima').removeClass('active');
+        $('#atividades-container').html(`
+          <div class="chip">
+            <label class="form-label">Descrição da atividade</label>
+            <textarea class="form-control" name="atividade[]" rows="3" required placeholder="Descreva detalhadamente a atividade realizada..."></textarea>
+            <div class="mt-2 text-end">
+              <button type="button" class="btn btn-sm btn-outline-danger remove-item"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>`);
+        $('#equipe-container').html(`
+          <div class="chip">
+            <div class="row g-3 align-items-end">
+              <div class="col-lg-5">
+                <label class="form-label">Nome do Funcionário</label>
+                <input type="text" class="form-control" name="funcionario[]" required />
+              </div>
+              <div class="col-lg-3">
+                <label class="form-label">Função</label>
+                <select class="form-select" name="funcao[]">
+                  <option value="">Selecione...</option>
+                  <option>Soldador</option><option>Encanador</option><option>Caldeireiro</option>
+                  <option>Mecânico</option><option>Eletrícista</option><option>Auxiliar</option>
+                  <option>Almoxarife</option><option>Técnico de Segurança</option><option>Encarregado</option>
+                  <option>Administrativo</option><option>Inspetor</option><option>Planejador</option>
+                  <option>Supervisor</option><option>Coordenador</option>
+                </select>
+              </div>
+              <div class="col-lg-4">
+                <label class="form-label">Horário de Trabalho</label>
+                <div class="d-flex gap-2">
+                  <input class="form-control" type="time" name="entrada[]" />
+                  <input class="form-control" type="time" name="saida[]" />
+                </div>
+              </div>
+            </div>
+            <div class="mt-2 text-end">
+              <button type="button" class="btn btn-sm btn-outline-danger remove-item"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>`);
+        $('#fotos-container').html(`
+          <div class="col-md-4">
+            <div class="thumb"><span class="text-muted">Pré-visualização</span></div>
+            <input class="form-control foto-input" type="file" accept="image/*" />
+            <input class="form-control form-control-sm mt-2 foto-legenda" placeholder="Legenda da foto" />
+          </div>`);
+        populateEmpresas(); setToday(); updateProgress(); showToast('Formulário limpo');
+      });
+
+      $('#submitBtn').on('click', async function(){
+        const required=['empresa','obra','data','turno','encarregado','area','clima'];
+        for(const id of required){ if(!$('#'+id).val()){ showToast('Preencha os campos obrigatórios','error'); $('#stepsNav a[href="#step-basicos"]').tab('show'); return; } }
+        const formData = collectFormData();
+        window.__photos = [];
+        const $inputs = $('.foto-input');
+        for(let i=0;i<$inputs.length;i++){
+          const file=$inputs[i].files?.[0];
+          if(file){ const dataUrl = await readFileAsDataURL(file); const legenda=$($inputs[i]).closest('.col-md-4').find('.foto-legenda').val(); window.__photos.push({dataUrl,legenda}); }
+        }
+        await generatePDF(formData,false);
+      });
+
+      $('#previewBtn').on('click', async function(){
+        const today = new Date().toISOString().split('T')[0];
+        const data = collectFormData();
+        if(!data.empresa) data.empresa='Suzano Aracruz';
+        if(!data.obra) data.obra='PP LINHA 5';
+        if(!data.data) data.data=today;
+        if(!data.encarregado) data.encarregado='MARCIO WESLEY FANCHIOTI';
+        if(!data.area) data.area='Caldeira de Recuperação';
+        if(!data.clima) data.clima='ensolarado';
+        window.__photos=[]; await generatePDF(data,true);
+      });
+
+      $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e){
+        if($(e.target).attr('href')==='#step-revisao'){
+          const d=collectFormData();
+          const html=`
+            <div class="row g-3">
+              <div class="col-md-4"><div class="small text-muted">Cliente</div><div class="fw-semibold">${d.empresa||'-'}</div></div>
+              <div class="col-md-4"><div class="small text-muted">Serviço</div><div class="fw-semibold">${d.obra||'-'}</div></div>
+              <div class="col-md-4"><div class="small text-muted">PC</div><div class="fw-semibold">${$('#obraPc').val()||'-'}</div></div>
+              <div class="col-md-4"><div class="small text-muted">Data</div><div class="fw-semibold">${d.data||'-'}</div></div>
+              <div class="col-md-4"><div class="small text-muted">Turno</div><div class="fw-semibold">${$('#turno option:selected').text()||'-'}</div></div>
+              <div class="col-md-4"><div class="small text-muted">Encarregado</div><div class="fw-semibold">${d.encarregado||'-'}</div></div>
+              <div class="col-md-12"><div class="small text-muted">Área</div><div class="fw-semibold">${d.area||'-'}</div></div>
+              <div class="col-md-12"><div class="small text-muted">Clima</div><div class="fw-semibold">${getClimaDescription(d.clima)}</div></div>
+            </div>`;
+          $('#resumo').html(html);
+        }
+      });
+    });
+  </script>
+
+  <div id="sidebarBackdrop" class="sidebar-backdrop d-lg-none"></div>
+
+<script>
+// Toggle off-canvas no mobile
+(function(){
+  const mqMobile = window.matchMedia('(max-width: 991px)');
+  function closeSidebar(){
+    document.querySelector('.sidebar')?.classList.remove('open');
+    document.getElementById('sidebarBackdrop')?.classList.remove('show');
+    document.body.classList.remove('sidebar-open');
+  }
+  function openSidebar(){
+    document.querySelector('.sidebar')?.classList.add('open');
+    document.getElementById('sidebarBackdrop')?.classList.add('show');
+    document.body.classList.add('sidebar-open');
+  }
+  document.getElementById('menuToggle')?.addEventListener('click', function(){
+    const s = document.querySelector('.sidebar');
+    if (!s) return;
+    if (s.classList.contains('open')) closeSidebar(); else openSidebar();
+  });
+  document.getElementById('sidebarBackdrop')?.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') closeSidebar();
+  });
+  const stepsNav = document.getElementById('stepsNav');
+  if (stepsNav){
+    stepsNav.addEventListener('click', function(e){
+      if (e.target.closest('.nav-link') && mqMobile.matches) closeSidebar();
+    });
+  }
+  mqMobile.addEventListener?.('change', () => {
+    if (!mqMobile.matches) closeSidebar();
+  });
+})();
+</script>
+
 </body>
 </html>
