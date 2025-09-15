@@ -3,12 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>RDO – Nova Interface V2</title>
+  <title>RDO – Nova Interface V3</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
   <link rel="icon" type="image/x-icon" href="https://powerembedded.blob.core.windows.net/images/339675c7-1df7-48ea-9b89-6b9ca06b8bd8/organization/favicon.png">
   <style>
-    :root{--brand:#111827;--brand-600:#1f2937;--brand-700:#0f172a;--accent:#2563eb;--ok:#16a34a;--warn:#f59e0b;--err:#ef4444;--muted:#6b7280;--paper:#ffffff;--bg:#f3f4f6}
+    :root{
+      --brand:#111827;--brand-600:#1f2937;--brand-700:#0f172a;--accent:#2563eb;
+      --ok:#16a34a;--warn:#f59e0b;--err:#ef4444;--muted:#6b7280;--paper:#ffffff;--bg:#f3f4f6;
+      --vh: 1vh; /* fallback para iOS */
+    }
     html,body{height:100%}
     html{-webkit-text-size-adjust:100%} /* evita auto-zoom em iOS/Android */
     body{background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial}
@@ -35,13 +39,13 @@
     .clima.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
     .thumb{height:180px;border:2px dashed #e5e7eb;border-radius:.8rem;display:flex;align-items:center;justify-content:center;background:#fafafa;overflow:hidden}
     .thumb img{max-width:100%;max-height:100%;object-fit:contain}
-    .fab{position:fixed;right:24px;bottom:24px;display:flex;flex-direction:column;gap:12px;z-index:1000}
-    .fab .btn{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 18px rgba(15,23,42,.2)}
+    .fab{position:fixed;right:24px;bottom:24px;display:flex;flex-direction:column;gap:12px;z-index:1000; pointer-events:none;}
+    .fab .btn{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 18px rgba(15,23,42,.2); pointer-events:auto;}
     footer{position:fixed;left:0;right:0;bottom:0;background:var(--brand-700);color:#e5e7eb;padding:.65rem}
     /* === PDF === */
     #pdf-container{
       display:none;
-      position:relative; /* importante para iOS: o wrapper controla a altura impressa */
+      position:relative; /* importante para iOS */
       background:#fff;color:#000;
       -webkit-print-color-adjust:exact; print-color-adjust:exact;
     }
@@ -73,7 +77,7 @@
     .signature-name{font-weight:700}
     .signature-role{font-size:.9em;color:#555}
 
-    /* === Impressão: forçar 3 colunas fixas nas grades de cabeçalho === */
+    /* === Impressão: 3 colunas fixas nas grades de cabeçalho === */
     @media print{
       @page{ size: A4 portrait; margin: 12mm 10mm 18mm 10mm; }
       body,html{margin:0;padding:0;background:#fff;color:#000}
@@ -85,7 +89,7 @@
 
       /* As seções de info usam SEMPRE 3 colunas */
       #pdf-page .pdf-grid{ display:grid; grid-template-columns:repeat(3, 1fr); column-gap:10px; row-gap:10px; }
-      #pdf-page .pdf-col{ min-width:0; } /* evita empurrar para nova linha */
+      #pdf-page .pdf-col{ min-width:0; }
 
       .pdf-header{page-break-inside:avoid}
       .avoid-break{break-inside:avoid}
@@ -96,15 +100,31 @@
       .signature-section{page-break-inside:avoid;break-inside:avoid}
     }
 
+    /* === MOBILE: Correções de rolagem nas abas === */
     @media (max-width: 991px){
       .app{grid-template-columns:1fr}
-      .sidebar{position:relative;height:auto}
-      .content{padding:0.9rem}
-      .clima-grid{grid-template-columns:repeat(2,minmax(120px,1fr))}
+      .sidebar{position:fixed;left:0;top:0;bottom:0;width:280px;height:100dvh;z-index:1040;transform:translateX(-100%);transition:transform .25s ease;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+      .sidebar.open{transform:translateX(0)}
+      .topbar{align-items:center}
+      /* layout em coluna com contêiner rolável confiável */
+      .content{
+        display:flex; flex-direction:column;
+        min-height:100dvh; height:100dvh;
+        padding:0.9rem;
+      }
+      @supports not (height: 100dvh){
+        .content{ min-height: calc(var(--vh) * 100); height: calc(var(--vh) * 100); }
+      }
+      .tab-content{
+        flex:1 1 auto; min-height:0;
+        overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
+      }
       .thumb{height:160px}
       .fab{right:16px;bottom:16px}
       .fab .btn{width:52px;height:52px}
     }
+
     @media (max-width: 575.98px){
       .content{padding:0.7rem}
       .panel{padding:.85rem}
@@ -112,19 +132,10 @@
       .chip{padding:.75rem}
       .thumb{height:140px}
     }
-    body.sidebar-open{overflow:hidden}
+
+    body.sidebar-open{overflow:hidden; touch-action:none;}
     .sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1030;display:none;opacity:0;transition:opacity .2s ease}
     .sidebar-backdrop.show{display:block;opacity:1}
-    @media (max-width: 991px){
-      .app{grid-template-columns:1fr}
-      .sidebar{
-        position:fixed;left:0;top:0;bottom:0;width:280px;height:100vh;
-        z-index:1040;transform:translateX(-100%);transition:transform .25s ease;
-        box-shadow:0 10px 24px rgba(0,0,0,.25)
-      }
-      .sidebar.open{transform:translateX(0)}
-      .topbar{align-items:center}
-    }
 
 /* === PATCH: Padronização de imagens 200x200 === */
 .thumb{ width:200px; height:200px; margin:0 auto; border:2px dashed #e5e7eb; border-radius:.8rem; display:flex; align-items:center; justify-content:center; overflow:hidden; }
@@ -448,15 +459,10 @@
       );
     }
 
-    /** ===================== FIT-TO-ONE-PAGE (seguro para iOS) =====================
-     * Aplica scale() apenas no elemento interno (#pdf-page) e ajusta a altura
-     * do wrapper (#pdf-container) para evitar recortes no "Salvar como PDF" do iOS.
-     */
+    /** ===================== FIT-TO-ONE-PAGE (seguro para iOS) ===================== */
     function fitToOnePage(pageEl, containerEl){
       if(!pageEl || !containerEl) return;
-      pageEl.classList.add('onepage'); // oculta .page-break no @media print
-
-      // reset de estilos
+      pageEl.classList.add('onepage');
       pageEl.style.transform = pageEl.style.webkitTransform = '';
       pageEl.style.width = '';
       containerEl.style.height = '';
@@ -465,26 +471,20 @@
       const PX_PER_MM = 96/25.4;
       const pageHeightMM = 297 - (12 + 18); // @page margin top/bottom
       const maxHeightPx = pageHeightMM * PX_PER_MM;
-
       const contentHeight = pageEl.scrollHeight;
 
       if (contentHeight > maxHeightPx){
         const scale = maxHeightPx / contentHeight;
-
         pageEl.style.transformOrigin = 'top left';
         pageEl.style.webkitTransformOrigin = 'top left';
         pageEl.style.transform = 'scale(' + scale + ') translateZ(0)';
         pageEl.style.webkitTransform = 'scale(' + scale + ') translateZ(0)';
         pageEl.style.width = (100/scale) + '%';
-
-        // Wrapper com altura "real" pós-escala para o compositor do iOS não cortar o final
         containerEl.style.height = (contentHeight * scale) + 'px';
         containerEl.style.overflow = 'hidden';
-
-        // Fudge de segurança para iOS: pequeno espaçador evita recorte da última linha
         if (isIOSDevice()){
           const spacer = document.createElement('div');
-          spacer.style.height = (6 * PX_PER_MM) + 'px'; // ~6mm
+          spacer.style.height = (6 * PX_PER_MM) + 'px';
           spacer.style.width = '100%';
           spacer.style.display = 'block';
           spacer.setAttribute('aria-hidden','true');
@@ -555,7 +555,7 @@
         bodyHtml += '</div></div>';
       }
 
-      // Assinaturas SEM usar position:fixed (compatível com iOS/Android/desktop)
+      // Assinaturas no fluxo (compatível com iOS/Android/desktop)
       bodyHtml += buildSignatureHTML();
 
       const finalHtml =
@@ -575,13 +575,26 @@
     }
 
     /* ===================== UI: EVENTOS ===================== */
+    function setVhUnit(){
+      document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+    }
+
     $(function(){
+      setVhUnit();
+      window.addEventListener('resize', setVhUnit, {passive:true});
+      window.addEventListener('orientationchange', setVhUnit);
+
       populateEmpresas(); setToday(); updateProgress();
 
       $('#empresa').on('change', function(){ const v=$(this).val(); populateAreas(v); populateObras(v); updateProgress(); });
       $('#obra').on('change', function(){ const pc=$(this).find('option:selected').data('pc')||''; $('#obraPc').val(pc); updateProgress(); });
       $('.clima').on('click', function(){ $('.clima').removeClass('active'); $(this).addClass('active'); $('#clima').val($(this).data('clima')); updateProgress(); });
       $('#data,#turno,#encarregado,#area').on('change', updateProgress);
+
+      // Sempre que mudar de aba, garantir que o contêiner rolável esteja no topo
+      $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(){
+        document.querySelector('.tab-content')?.scrollTo({top:0, behavior:'instant'});
+      });
 
       $(document).on('click','#add-atividade', function(){
         $('#atividades-container').append(`
