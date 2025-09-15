@@ -10,8 +10,7 @@
   <style>
     :root{--brand:#111827;--brand-600:#1f2937;--brand-700:#0f172a;--accent:#2563eb;--ok:#16a34a;--warn:#f59e0b;--err:#ef4444;--muted:#6b7280;--paper:#ffffff;--bg:#f3f4f6}
     html,body{height:100%}
-    /* Evita auto-zoom de fontes no iOS/Android (impede que tudo fique “gigante” ao imprimir em PDF) */
-    html{-webkit-text-size-adjust:100%}
+    html{-webkit-text-size-adjust:100%} /* evita auto-zoom em iOS/Android */
     body{background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial}
     .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
     .sidebar{background:var(--brand-700);color:#fff;position:sticky;top:0;align-self:start;height:100vh}
@@ -39,9 +38,19 @@
     .fab{position:fixed;right:24px;bottom:24px;display:flex;flex-direction:column;gap:12px;z-index:1000}
     .fab .btn{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 18px rgba(15,23,42,.2)}
     footer{position:fixed;left:0;right:0;bottom:0;background:var(--brand-700);color:#e5e7eb;padding:.65rem}
-    #pdf-container{display:none;font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    /* Container que receberá escala para caber em 1 página */
-    #pdf-container.onepage{transform-origin:top left;-webkit-transform-origin:top left}
+    /* === PDF === */
+    #pdf-container{
+      display:none;
+      position:relative; /* importante para iOS: o wrapper controla a altura impressa */
+      background:#fff;color:#000;
+      -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    }
+    #pdf-page{
+      transform-origin:top left; -webkit-transform-origin:top left;
+      will-change:transform;
+      font-family:Arial,Helvetica,sans-serif;
+    }
+    #pdf-page.onepage .page-break{ display:none !important; }
     .pdf-header{display:flex;gap:16px;align-items:center;border-bottom:2px solid #002060;padding-bottom:8px;margin-bottom:10px}
     .pdf-h-title{color:#002060;font-size:20px;font-weight:700;margin:0}
     .pdf-info{border:1px solid #ddd;border-radius:6px;padding:10px;margin:10px 0;background:#fafafa}
@@ -63,22 +72,21 @@
     .signature-line{height:1px;background:#000;margin:28px 0 6px}
     .signature-name{font-weight:700}
     .signature-role{font-size:.9em;color:#555}
+
     @media print{
       @page{ size: A4 portrait; margin: 12mm 10mm 18mm 10mm; }
       body,html{margin:0;padding:0;background:#fff;color:#000}
       .app,.topbar,.sidebar,.fab,footer{display:none !important}
       #pdf-container{display:block !important;padding:0;margin:0;font-size:10pt}
-      /* Se estivermos no modo 1 página, desabilita quebras forçadas */
-      #pdf-container.onepage .page-break{display:none !important}
       .pdf-header{page-break-inside:avoid}
       .avoid-break{break-inside:avoid}
       .pdf-imgwrap{break-inside:avoid}
       .page-break{break-before:page}
       .pdf-table thead{display:table-header-group}
       .pdf-table tr{page-break-inside:avoid;break-inside:avoid}
-      /* Evita corte da assinatura e aumenta compatibilidade com iOS */
       .signature-section{page-break-inside:avoid;break-inside:avoid}
     }
+
     @media (max-width: 991px){
       .app{grid-template-columns:1fr}
       .sidebar{position:relative;height:auto}
@@ -108,63 +116,21 @@
       .sidebar.open{transform:translateX(0)}
       .topbar{align-items:center}
     }
-  
-/* === PATCH: Padronização de imagens anexadas em 200x200 (UI e Impressão) === */
-/* Pré-visualização no formulário */
-.thumb{
-  width: 200px;
-  height: 200px;
-  margin: 0 auto;
-  border: 2px dashed #e5e7eb;
-  border-radius: .8rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.thumb img{
-  width: 200px;
-  height: 200px;
-  object-fit: contain;
-}
 
-/* Grade de fotos no PDF */
-.pdf-imggrid{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.pdf-imgwrap{
-  flex: 0 0 200px;
-  width: 200px;
-  max-width: none;
-  break-inside: avoid;
-}
-.pdf-imgbox{
-  width: 200px;
-  height: 200px;
-  min-height: 200px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.pdf-imgbox img{
-  width: 200px;
-  height: 200px;
-  object-fit: contain;
-}
-
-/* Reforço em impressão para manter 200x200 com prioridade */
+/* === PATCH: Padronização de imagens 200x200 === */
+.thumb{ width:200px; height:200px; margin:0 auto; border:2px dashed #e5e7eb; border-radius:.8rem; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.thumb img{ width:200px; height:200px; object-fit:contain; }
+.pdf-imggrid{ display:flex; flex-wrap:wrap; gap:12px; }
+.pdf-imgwrap{ flex:0 0 200px; width:200px; max-width:none; break-inside:avoid; }
+.pdf-imgbox{ width:200px; height:200px; min-height:200px; border:1px solid #ddd; border-radius:6px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.pdf-imgbox img{ width:200px; height:200px; object-fit:contain; }
 @media print{
-  .pdf-imgwrap{ flex: 0 0 200px !important; width: 200px !important; }
-  .pdf-imgbox{ width: 200px !important; height: 200px !important; }
-  .pdf-imgbox img{ width: 200px !important; height: 200px !important; }
+  .pdf-imgwrap{ flex:0 0 200px !important; width:200px !important; }
+  .pdf-imgbox{ width:200px !important; height:200px !important; }
+  .pdf-imgbox img{ width:200px !important; height:200px !important; }
 }
 /* === /PATCH === */
-</style>
+  </style>
 </head>
 <body>
   <div class="app">
@@ -364,7 +330,7 @@
         <section class="tab-pane fade" id="step-revisao" role="tabpanel">
           <div class="panel">
             <h5>Revisão rápida</h5>
-            <p class="muted">Use os botões flutuantes para visualizar/imprimir. A assinatura sai no rodapé de todas as páginas.</p>
+            <p class="muted">Use os botões flutuantes para visualizar/imprimir. A assinatura sai no rodapé.</p>
             <div id="resumo" class="small"></div>
           </div>
         </section>
@@ -380,8 +346,10 @@
 
   <footer class="text-center small">RDO &copy; 2025 – Thaynison Couto</footer>
 
-  <!-- contêiner usado somente para impressão -->
-  <div id="pdf-container"></div>
+  <!-- Área de impressão -->
+  <div id="pdf-container">
+    <div id="pdf-page"></div>
+  </div>
 
   <!-- modal limpar -->
   <div class="modal fade" id="confirmClearModal" tabindex="-1">
@@ -453,43 +421,6 @@
     function maybePageBreakAfterActivities(len, forceOnePage){ return forceOnePage ? '' : (len >= 18 ? '<div class="page-break"></div>' : ''); }
     function maybePageBreakBeforePhotos(teamLen, fotoLen, forceOnePage){ return forceOnePage ? '' : ((teamLen >= 12 || fotoLen > 6) ? '<div class="page-break"></div>' : ''); }
 
-    /** ===================== FIT-TO-ONE-PAGE (método novo) =====================
-     * Faz o conteúdo caber em exatamente UMA página A4, reduzindo por escala.
-     * - Remove quebras forçadas
-     * - Calcula a altura útil da página (A4 menos margens @page)
-     * - Aplica transform scale() e aumenta a largura proporcional para manter layout
-     */
-    function fitToOnePage(container){
-      if(!container) return;
-      container.classList.add('onepage'); // oculta .page-break no @media print
-
-      // reseta escala anterior (se existir)
-      container.style.transform = '';
-      container.style.webkitTransform = '';
-      container.style.width = '';
-
-      // mm -> px (96dpi padrão CSS): 1in=25.4mm => 96/25.4
-      const PX_PER_MM = 96/25.4;
-
-      // Altura útil da página considerando as margens declaradas em @page
-      const pageHeightMM = 297 - (12 + 18); // A4 297mm, margens sup=12mm, inf=18mm
-      const maxHeightPx = pageHeightMM * PX_PER_MM;
-
-      // Altura atual do conteúdo
-      const contentHeight = container.scrollHeight;
-
-      if (contentHeight > maxHeightPx){
-        const scale = maxHeightPx / contentHeight;
-        // Aplica escala e compensa a largura para manter a quebra de linhas
-        container.style.transformOrigin = 'top left';
-        container.style.webkitTransformOrigin = 'top left';
-        container.style.transform = 'scale(' + scale + ')';
-        container.style.webkitTransform = 'scale(' + scale + ')';
-        container.style.width = (100/scale) + '%';
-      }
-    }
-
-    // Detecção iOS (inclui iPadOS)
     function isIOSDevice(){
       return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     }
@@ -506,6 +437,51 @@
         '  </div>' +
         '</div>'
       );
+    }
+
+    /** ===================== FIT-TO-ONE-PAGE (seguro para iOS) =====================
+     * Aplica scale() apenas no elemento interno (#pdf-page) e ajusta a altura
+     * do wrapper (#pdf-container) para evitar recortes no "Salvar como PDF" do iOS.
+     */
+    function fitToOnePage(pageEl, containerEl){
+      if(!pageEl || !containerEl) return;
+      pageEl.classList.add('onepage'); // oculta .page-break no @media print
+
+      // reset de estilos
+      pageEl.style.transform = pageEl.style.webkitTransform = '';
+      pageEl.style.width = '';
+      containerEl.style.height = '';
+      containerEl.style.overflow = '';
+
+      const PX_PER_MM = 96/25.4;
+      const pageHeightMM = 297 - (12 + 18); // @page margin top/bottom
+      const maxHeightPx = pageHeightMM * PX_PER_MM;
+
+      const contentHeight = pageEl.scrollHeight;
+
+      if (contentHeight > maxHeightPx){
+        const scale = maxHeightPx / contentHeight;
+
+        pageEl.style.transformOrigin = 'top left';
+        pageEl.style.webkitTransformOrigin = 'top left';
+        pageEl.style.transform = 'scale(' + scale + ') translateZ(0)';
+        pageEl.style.webkitTransform = 'scale(' + scale + ') translateZ(0)';
+        pageEl.style.width = (100/scale) + '%';
+
+        // Wrapper com altura "real" pós-escala para o compositor do iOS não cortar o final
+        containerEl.style.height = (contentHeight * scale) + 'px';
+        containerEl.style.overflow = 'hidden';
+
+        // Fudge de segurança para iOS: pequeno espaçador evita recorte da última linha
+        if (isIOSDevice()){
+          const spacer = document.createElement('div');
+          spacer.style.height = (6 * PX_PER_MM) + 'px'; // ~6mm
+          spacer.style.width = '100%';
+          spacer.style.display = 'block';
+          spacer.setAttribute('aria-hidden','true');
+          pageEl.appendChild(spacer);
+        }
+      }
     }
 
     /* ===================== GERAÇÃO DO PDF ===================== */
@@ -570,32 +546,21 @@
         bodyHtml += '</div></div>';
       }
 
-      // Assinaturas
-      const footerHtml = buildSignatureHTML();
-      const ios = isIOSDevice();
+      // Assinaturas SEM usar position:fixed (compatível com iOS/Android/desktop)
+      bodyHtml += buildSignatureHTML();
 
-      // iOS: coloca a assinatura dentro do fluxo do conteúdo para garantir exibição
-      // Demais: manter em container no final (não precisamos repetir por página, pois forçamos 1 página)
-      let finalHtml = '';
-      if (ios){
-        finalHtml =
-          '<div class="pdf-doc">' +
-          '  <div class="pdf-body"><div class="pdf-content">'+ bodyHtml + footerHtml +'</div></div>' +
-          '</div>';
-      } else {
-        finalHtml =
-          '<div class="pdf-doc">' +
-          '  <div class="pdf-body"><div class="pdf-content">'+ bodyHtml +'</div></div>' +
-          '  <div class="pdf-footer-fixed">'+ footerHtml +'</div>' +
-          '</div>';
-      }
+      const finalHtml =
+        '<div class="pdf-doc">' +
+        '  <div class="pdf-body"><div class="pdf-content">'+ bodyHtml +'</div></div>' +
+        '</div>';
 
       const $pdf = $('#pdf-container');
-      $pdf.html(finalHtml);
+      const $page = $('#pdf-page');
+      $page.html(finalHtml);
 
       // Aguarda layout, ajusta para caber em 1 página e imprime
       await new Promise(r=>setTimeout(r,300));
-      fitToOnePage($pdf[0]);
+      fitToOnePage($page[0], $pdf[0]);
       await new Promise(r=>setTimeout(r,50));
       window.print();
     }
