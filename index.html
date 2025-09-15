@@ -8,12 +8,9 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
   <link rel="icon" type="image/x-icon" href="https://powerembedded.blob.core.windows.net/images/339675c7-1df7-48ea-9b89-6b9ca06b8bd8/organization/favicon.png">
   <style>
-    :root{
-      --brand:#111827;--brand-600:#1f2937;--brand-700:#0f172a;--accent:#2563eb;--ok:#16a34a;--warn:#f59e0b;--err:#ef4444;--muted:#6b7280;--paper:#ffffff;--bg:#f3f4f6
-    }
+    :root{--brand:#111827;--brand-600:#1f2937;--brand-700:#0f172a;--accent:#2563eb;--ok:#16a34a;--warn:#f59e0b;--err:#ef4444;--muted:#6b7280;--paper:#ffffff;--bg:#f3f4f6}
     html,body{height:100%}
     body{background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial}
-
     .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
     .sidebar{background:var(--brand-700);color:#fff;position:sticky;top:0;align-self:start;height:100vh}
     .sidebar .brand{display:flex;align-items:center;gap:.6rem;padding:1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.06)}
@@ -23,7 +20,6 @@
     .step-nav .nav-link{color:#cbd5e1;border-radius:.6rem;padding:.65rem .8rem;display:flex;align-items:center;gap:.55rem}
     .step-nav .nav-link.active{background:rgba(37,99,235,.18);color:#fff;border:1px solid rgba(37,99,235,.35)}
     .step-nav .badge{margin-left:auto}
-
     .content{padding:1.2rem 1.4rem}
     .topbar{background:var(--paper);border-radius:1rem;box-shadow:0 6px 20px rgba(15,23,42,.06);padding:.9rem 1rem;margin-bottom:1.1rem;display:flex;gap:.75rem;align-items:center}
     .panel{background:var(--paper);border-radius:1rem;box-shadow:0 6px 20px rgba(15,23,42,.06);padding:1rem;margin-bottom:1.1rem}
@@ -32,77 +28,53 @@
     .progress-lite{height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden}
     .progress-lite .bar{height:100%;width:0;background:var(--accent)}
     .chip{background:#f1f5f9;border:1px dashed #e2e8f0;border-radius:.75rem;padding:.85rem}
-
     .clima-grid{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:.7rem}
     .clima{cursor:pointer;border:1px solid #e5e7eb;border-radius:.8rem;padding:.8rem;text-align:center;transition:all .15s ease;background:#fff}
     .clima i{font-size:1.25rem;margin-bottom:.25rem;display:block}
     .clima.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
-
     .thumb{height:180px;border:2px dashed #e5e7eb;border-radius:.8rem;display:flex;align-items:center;justify-content:center;background:#fafafa;overflow:hidden}
     .thumb img{max-width:100%;max-height:100%;object-fit:contain}
-
     .fab{position:fixed;right:24px;bottom:24px;display:flex;flex-direction:column;gap:12px;z-index:1000}
     .fab .btn{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 18px rgba(15,23,42,.2)}
-
     footer{position:fixed;left:0;right:0;bottom:0;background:var(--brand-700);color:#e5e7eb;padding:.65rem}
-
-    /* ===================== PRINT / PDF ===================== */
     #pdf-container{display:none;font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-
     .pdf-header{display:flex;gap:16px;align-items:center;border-bottom:2px solid #002060;padding-bottom:8px;margin-bottom:10px}
     .pdf-h-title{color:#002060;font-size:20px;font-weight:700;margin:0}
-
     .pdf-info{border:1px solid #ddd;border-radius:6px;padding:10px;margin:10px 0;background:#fafafa}
     .pdf-grid{display:flex;flex-wrap:wrap;gap:10px}
     .pdf-col{flex:1;min-width:200px}
     .pdf-label{font-weight:700;color:#002060}
-
     .pdf-section{margin:10px 0}
     .pdf-section-title{display:block;width:100%;box-sizing:border-box;background:#002060;color:#fff;padding:6px;border-radius:4px;font-weight:700}
     .pdf-table{width:100%;border-collapse:collapse}
     .pdf-table th,.pdf-table td{border:1px solid #ddd;padding:6px;text-align:left}
-
     .pdf-imggrid{display:flex;flex-wrap:wrap;gap:12px}
     .pdf-imgwrap{flex:1 1 30%;max-width:33%}
     .pdf-imgbox{min-height:180px;border:1px solid #ddd;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
     .pdf-imgbox img{max-width:100%;max-height:100%;object-fit:contain}
     .pdf-caption{text-align:center;font-style:italic;font-size:.9em;margin-top:4px}
-
     .signature-title{text-align:center;font-weight:700;color:#002060;border-top:1px solid #ddd;padding-top:8px;margin-bottom:6px}
     .signature-grid{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
     .signature-box{width:23%;min-width:150px;text-align:center}
     .signature-line{height:1px;background:#000;margin:28px 0 6px}
     .signature-name{font-weight:700}
     .signature-role{font-size:.9em;color:#555}
-
     @media print{
-      /* reserva espaço de margem, o rodapé repete via table-footer-group */
       @page{ size: A4 portrait; margin: 12mm 10mm 18mm 10mm; }
-
       body,html{margin:0;padding:0;background:#fff;color:#000}
       .app,.topbar,.sidebar,.fab,footer{display:none !important}
-
-      /* mostra somente o contêiner do PDF */
       #pdf-container{display:block !important;padding:0;margin:0;font-size:10pt}
-
-      /* cabeçalhos e linhas não quebram no meio */
       .pdf-header{page-break-inside:avoid}
       .avoid-break{break-inside:avoid}
       .pdf-imgwrap{break-inside:avoid}
       .page-break{break-before:page}
-
       .pdf-table thead{display:table-header-group}
       .pdf-table tr{page-break-inside:avoid;break-inside:avoid}
-
-      /* nova estratégia cross-browser para rodapé fixo em todas as páginas */
       .pdf-doc{display:table;width:100%}
       .pdf-body{display:table-row-group}
       .pdf-footer-fixed{display:table-footer-group}
-      /* anula qualquer posicionamento fixo */
       .pdf-footer-fixed .signature-section{position:static;height:auto;margin:0}
     }
-
-    /* ===================== RESPONSIVO APP ===================== */
     @media (max-width: 991px){
       .app{grid-template-columns:1fr}
       .sidebar{position:relative;height:auto}
@@ -119,8 +91,6 @@
       .chip{padding:.75rem}
       .thumb{height:140px}
     }
-
-    /* Sidebar off-canvas mobile */
     body.sidebar-open{overflow:hidden}
     .sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1030;display:none;opacity:0;transition:opacity .2s ease}
     .sidebar-backdrop.show{display:block;opacity:1}
@@ -134,7 +104,63 @@
       .sidebar.open{transform:translateX(0)}
       .topbar{align-items:center}
     }
-  </style>
+  
+/* === PATCH: Padronização de imagens anexadas em 200x200 (UI e Impressão) === */
+/* Pré-visualização no formulário */
+.thumb{
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  border: 2px dashed #e5e7eb;
+  border-radius: .8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.thumb img{
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}
+
+/* Grade de fotos no PDF */
+.pdf-imggrid{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.pdf-imgwrap{
+  flex: 0 0 200px;
+  width: 200px;
+  max-width: none;
+  break-inside: avoid;
+}
+.pdf-imgbox{
+  width: 200px;
+  height: 200px;
+  min-height: 200px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.pdf-imgbox img{
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}
+
+/* Reforço em impressão para manter 200x200 com prioridade */
+@media print{
+  .pdf-imgwrap{ flex: 0 0 200px !important; width: 200px !important; }
+  .pdf-imgbox{ width: 200px !important; height: 200px !important; }
+  .pdf-imgbox img{ width: 200px !important; height: 200px !important; }
+}
+/* === /PATCH === */
+</style>
 </head>
 <body>
   <div class="app">
@@ -684,7 +710,7 @@
 
     /* ===================== SIDEBAR OFF-CANVAS ===================== */
     (function(){
-      const mqMobile = window.matchMedia('(max-width: 991px)');
+      const mqMobile = window.matchMedia('(max-width: 991px)');3
       function closeSidebar(){
         document.querySelector('.sidebar')?.classList.remove('open');
         document.getElementById('sidebarBackdrop')?.classList.remove('show');
