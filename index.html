@@ -73,11 +73,20 @@
     .signature-name{font-weight:700}
     .signature-role{font-size:.9em;color:#555}
 
+    /* === Impressão: forçar 3 colunas fixas nas grades de cabeçalho === */
     @media print{
       @page{ size: A4 portrait; margin: 12mm 10mm 18mm 10mm; }
       body,html{margin:0;padding:0;background:#fff;color:#000}
       .app,.topbar,.sidebar,.fab,footer{display:none !important}
-      #pdf-container{display:block !important;padding:0;margin:0;font-size:10pt}
+
+      /* Fixar largura de área imprimível para A4 independente do dispositivo */
+      #pdf-container{display:block !important;padding:0;margin:0 auto;font-size:10pt; width: calc(210mm - 10mm - 10mm);}
+      #pdf-page{ width:100%; }
+
+      /* As seções de info usam SEMPRE 3 colunas */
+      #pdf-page .pdf-grid{ display:grid; grid-template-columns:repeat(3, 1fr); column-gap:10px; row-gap:10px; }
+      #pdf-page .pdf-col{ min-width:0; } /* evita empurrar para nova linha */
+
       .pdf-header{page-break-inside:avoid}
       .avoid-break{break-inside:avoid}
       .pdf-imgwrap{break-inside:avoid}
