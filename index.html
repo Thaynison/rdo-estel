@@ -10,6 +10,8 @@
   <style>
     :root{--brand:#111827;--brand-600:#1f2937;--brand-700:#0f172a;--accent:#2563eb;--ok:#16a34a;--warn:#f59e0b;--err:#ef4444;--muted:#6b7280;--paper:#ffffff;--bg:#f3f4f6}
     html,body{height:100%}
+    /* Evita auto-zoom de fontes no iOS/Android (impede que tudo fique “gigante” ao imprimir em PDF) */
+    html{-webkit-text-size-adjust:100%}
     body{background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial}
     .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
     .sidebar{background:var(--brand-700);color:#fff;position:sticky;top:0;align-self:start;height:100vh}
@@ -38,6 +40,8 @@
     .fab .btn{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 18px rgba(15,23,42,.2)}
     footer{position:fixed;left:0;right:0;bottom:0;background:var(--brand-700);color:#e5e7eb;padding:.65rem}
     #pdf-container{display:none;font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    /* Container que receberá escala para caber em 1 página */
+    #pdf-container.onepage{transform-origin:top left;-webkit-transform-origin:top left}
     .pdf-header{display:flex;gap:16px;align-items:center;border-bottom:2px solid #002060;padding-bottom:8px;margin-bottom:10px}
     .pdf-h-title{color:#002060;font-size:20px;font-weight:700;margin:0}
     .pdf-info{border:1px solid #ddd;border-radius:6px;padding:10px;margin:10px 0;background:#fafafa}
@@ -64,16 +68,16 @@
       body,html{margin:0;padding:0;background:#fff;color:#000}
       .app,.topbar,.sidebar,.fab,footer{display:none !important}
       #pdf-container{display:block !important;padding:0;margin:0;font-size:10pt}
+      /* Se estivermos no modo 1 página, desabilita quebras forçadas */
+      #pdf-container.onepage .page-break{display:none !important}
       .pdf-header{page-break-inside:avoid}
       .avoid-break{break-inside:avoid}
       .pdf-imgwrap{break-inside:avoid}
       .page-break{break-before:page}
       .pdf-table thead{display:table-header-group}
       .pdf-table tr{page-break-inside:avoid;break-inside:avoid}
-      .pdf-doc{display:table;width:100%}
-      .pdf-body{display:table-row-group}
-      .pdf-footer-fixed{display:table-footer-group}
-      .pdf-footer-fixed .signature-section{position:static;height:auto;margin:0}
+      /* Evita corte da assinatura e aumenta compatibilidade com iOS */
+      .signature-section{page-break-inside:avoid;break-inside:avoid}
     }
     @media (max-width: 991px){
       .app{grid-template-columns:1fr}
@@ -445,93 +449,154 @@
       return formData;
     }
 
-    // heurísticas de quebra
-    function maybePageBreakAfterActivities(len){ return len >= 18 ? '<div class="page-break"></div>' : ''; }
-    function maybePageBreakBeforePhotos(teamLen, fotoLen){ return (teamLen >= 12 || fotoLen > 6) ? '<div class="page-break"></div>' : ''; }
+    // heurísticas de quebra (NÃO usadas quando forçar 1 página)
+    function maybePageBreakAfterActivities(len, forceOnePage){ return forceOnePage ? '' : (len >= 18 ? '<div class="page-break"></div>' : ''); }
+    function maybePageBreakBeforePhotos(teamLen, fotoLen, forceOnePage){ return forceOnePage ? '' : ((teamLen >= 12 || fotoLen > 6) ? '<div class="page-break"></div>' : ''); }
+
+    /** ===================== FIT-TO-ONE-PAGE (método novo) =====================
+     * Faz o conteúdo caber em exatamente UMA página A4, reduzindo por escala.
+     * - Remove quebras forçadas
+     * - Calcula a altura útil da página (A4 menos margens @page)
+     * - Aplica transform scale() e aumenta a largura proporcional para manter layout
+     */
+    function fitToOnePage(container){
+      if(!container) return;
+      container.classList.add('onepage'); // oculta .page-break no @media print
+
+      // reseta escala anterior (se existir)
+      container.style.transform = '';
+      container.style.webkitTransform = '';
+      container.style.width = '';
+
+      // mm -> px (96dpi padrão CSS): 1in=25.4mm => 96/25.4
+      const PX_PER_MM = 96/25.4;
+
+      // Altura útil da página considerando as margens declaradas em @page
+      const pageHeightMM = 297 - (12 + 18); // A4 297mm, margens sup=12mm, inf=18mm
+      const maxHeightPx = pageHeightMM * PX_PER_MM;
+
+      // Altura atual do conteúdo
+      const contentHeight = container.scrollHeight;
+
+      if (contentHeight > maxHeightPx){
+        const scale = maxHeightPx / contentHeight;
+        // Aplica escala e compensa a largura para manter a quebra de linhas
+        container.style.transformOrigin = 'top left';
+        container.style.webkitTransformOrigin = 'top left';
+        container.style.transform = 'scale(' + scale + ')';
+        container.style.webkitTransform = 'scale(' + scale + ')';
+        container.style.width = (100/scale) + '%';
+      }
+    }
+
+    // Detecção iOS (inclui iPadOS)
+    function isIOSDevice(){
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
+    function buildSignatureHTML(){
+      return (
+        '<div class="signature-section">' +
+        '  <div class="signature-title">ASSINATURAS</div>' +
+        '  <div class="signature-grid">' +
+        '    <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Supervisão</div><div class="signature-role">Responsável pela supervisão</div></div>' +
+        '    <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Planejamento</div><div class="signature-role">Responsável pelo planejamento</div></div>' +
+        '    <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Resp. Contratante</div><div class="signature-role">Responsável pelo contratante</div></div>' +
+        '    <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Resp. Contratante</div><div class="signature-role">Responsável pelo contratante</div></div>' +
+        '  </div>' +
+        '</div>'
+      );
+    }
 
     /* ===================== GERAÇÃO DO PDF ===================== */
-    async function generatePDF(formData, isPreview=false){
-      // prepara fotos
+    async function generatePDF(formData, isPreview=false, forceOnePage=true){
       const photos = window.__photos||[];
       const photoCount = photos.length;
 
       let bodyHtml = '';
-      bodyHtml += `  <div class="pdf-header">`+
-                  `    <div><h1 class="pdf-h-title">Registro Diário de Obra - RDO</h1><div>Documento de registro das atividades</div></div>`+
-                  `  </div>`;
+      bodyHtml += '<div class="pdf-header">' +
+                  '  <div><h1 class="pdf-h-title">Registro Diário de Obra - RDO</h1><div>Documento de registro das atividades</div></div>' +
+                  '</div>';
 
-      bodyHtml += `<div class="pdf-info">`+
-                  `  <div class="pdf-grid">`+
-                  `    <div class="pdf-col"><div class="pdf-label">Cliente</div><div>${formData.empresa||'Não informado'}</div></div>`+
-                  `    <div class="pdf-col"><div class="pdf-label">Serviço</div><div>${formData.obra||'Não informado'}</div></div>`+
-                  `    <div class="pdf-col"><div class="pdf-label">Nº do Pedido (PC)</div><div>${$('#obraPc').val()||'Não informado'}</div></div>`+
-                  `  </div>`+
-                  `  <div class="pdf-grid">`+
-                  `    <div class="pdf-col"><div class="pdf-label">Data</div><div>${formData.data?formData.data.split('-').reverse().join('/'):'Não informado'}</div></div>`+
-                  `    <div class="pdf-col"><div class="pdf-label">Turno</div><div>${$('#turno option:selected').text()||'Não informado'}</div></div>`+
-                  `    <div class="pdf-col"><div class="pdf-label">Encarregado</div><div>${formData.encarregado||'Não informado'}</div></div>`+
-                  `  </div>`+
-                  `  <div class="pdf-grid">`+
-                  `    <div class="pdf-col"><div class="pdf-label">Área/Unidade</div><div>${formData.area||'Não informado'}</div></div>`+
-                  `    <div class="pdf-col"><div class="pdf-label">Condições Climáticas</div><div>${getClimaDescription(formData.clima)}</div></div>`+
-                  `    <div class="pdf-col"><div class="pdf-label">Emissão</div><div>${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}</div></div>`+
-                  `  </div>`+
-                  `</div>`;
+      bodyHtml += '<div class="pdf-info">' +
+                  '  <div class="pdf-grid">' +
+                  '    <div class="pdf-col"><div class="pdf-label">Cliente</div><div>' + (formData.empresa||'Não informado') + '</div></div>' +
+                  '    <div class="pdf-col"><div class="pdf-label">Serviço</div><div>' + (formData.obra||'Não informado') + '</div></div>' +
+                  '    <div class="pdf-col"><div class="pdf-label">Nº do Pedido (PC)</div><div>' + ($('#obraPc').val()||'Não informado') + '</div></div>' +
+                  '  </div>' +
+                  '  <div class="pdf-grid">' +
+                  '    <div class="pdf-col"><div class="pdf-label">Data</div><div>' + (formData.data?formData.data.split('-').reverse().join('/'):'Não informado') + '</div></div>' +
+                  '    <div class="pdf-col"><div class="pdf-label">Turno</div><div>' + ($('#turno option:selected').text()||'Não informado') + '</div></div>' +
+                  '    <div class="pdf-col"><div class="pdf-label">Encarregado</div><div>' + (formData.encarregado||'Não informado') + '</div></div>' +
+                  '  </div>' +
+                  '  <div class="pdf-grid">' +
+                  '    <div class="pdf-col"><div class="pdf-label">Área/Unidade</div><div>' + (formData.area||'Não informado') + '</div></div>' +
+                  '    <div class="pdf-col"><div class="pdf-label">Condições Climáticas</div><div>' + getClimaDescription(formData.clima) + '</div></div>' +
+                  '    <div class="pdf-col"><div class="pdf-label">Emissão</div><div>' + new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR') + '</div></div>' +
+                  '  </div>' +
+                  '</div>';
 
       if(formData.atividades?.length){
-        bodyHtml += `<div class="pdf-section avoid-break"><div class="pdf-section-title">Atividades Realizadas</div><ol>`;
-        formData.atividades.forEach(a=>bodyHtml += `<li>${a}</li>`);
-        bodyHtml += `</ol></div>`;
-        bodyHtml += maybePageBreakAfterActivities(formData.atividades.length);
+        bodyHtml += '<div class="pdf-section avoid-break"><div class="pdf-section-title">Atividades Realizadas</div><ol>';
+        formData.atividades.forEach(a=> bodyHtml += '<li>' + a + '</li>');
+        bodyHtml += '</ol></div>';
+        bodyHtml += maybePageBreakAfterActivities(formData.atividades.length, forceOnePage);
       } else if(isPreview){
-        bodyHtml += `<div class="pdf-section avoid-break"><div class="pdf-section-title">Atividades Realizadas</div><p><em>Exemplo de visualização</em></p><ol><li>Instalação de tubulação</li><li>Manutenção preventiva</li><li>Substituição de válvulas</li></ol></div>`;
+        bodyHtml += '<div class="pdf-section avoid-break"><div class="pdf-section-title">Atividades Realizadas</div><p><em>Exemplo de visualização</em></p><ol><li>Instalação de tubulação</li><li>Manutenção preventiva</li><li>Substituição de válvulas</li></ol></div>';
       }
 
       if(formData.observacoes && formData.observacoes.trim()){
-        bodyHtml += `<div class="pdf-section avoid-break"><div class="pdf-section-title">Observações</div><p>${formData.observacoes}</p></div>`;
+        bodyHtml += '<div class="pdf-section avoid-break"><div class="pdf-section-title">Observações</div><p>' + formData.observacoes + '</p></div>';
       }
 
       if(formData.equipe?.length){
-        bodyHtml += `<div class="pdf-section"><div class="pdf-section-title">Equipe</div>`+
-                    `<table class="pdf-table"><thead><tr><th>Nome</th><th>Função</th><th>Entrada</th><th>Saída</th></tr></thead><tbody>`;
-        formData.equipe.forEach(m=>{ bodyHtml += `<tr><td>${m.nome||''}</td><td>${m.funcao||''}</td><td>${m.entrada||''}</td><td>${m.saida||''}</td></tr>`; });
-        bodyHtml += `</tbody></table></div>`;
+        bodyHtml += '<div class="pdf-section"><div class="pdf-section-title">Equipe</div>' +
+                    '<table class="pdf-table"><thead><tr><th>Nome</th><th>Função</th><th>Entrada</th><th>Saída</th></tr></thead><tbody>';
+        formData.equipe.forEach(m=>{ bodyHtml += '<tr><td>'+(m.nome||'')+'</td><td>'+(m.funcao||'')+'</td><td>'+(m.entrada||'')+'</td><td>'+(m.saida||'')+'</td></tr>'; });
+        bodyHtml += '</tbody></table></div>';
       }
 
       if(photoCount){
-        bodyHtml += maybePageBreakBeforePhotos(formData.equipe?.length||0, photoCount);
-        bodyHtml += `<div class="pdf-section"><div class="pdf-section-title">Anexos de Fotos</div><div class="pdf-imggrid">`;
+        bodyHtml += maybePageBreakBeforePhotos(formData.equipe?.length||0, photoCount, forceOnePage);
+        bodyHtml += '<div class="pdf-section"><div class="pdf-section-title">Anexos de Fotos</div><div class="pdf-imggrid">';
         photos.forEach((f,i)=>{
           if(f?.dataUrl){
-            bodyHtml += `<div class="pdf-imgwrap"><div class="pdf-imgbox"><img src="${f.dataUrl}" alt="Foto ${i+1}"></div><div class="pdf-caption">${f.legenda||('Foto '+(i+1))}</div></div>`;
-            if(((i+1) % 6) === 0 && (i+1) < photoCount){
-              bodyHtml += `</div></div><div class="page-break"></div><div class="pdf-section"><div class="pdf-section-title">Anexos de Fotos (cont.)</div><div class="pdf-imggrid">`;
+            bodyHtml += '<div class="pdf-imgwrap"><div class="pdf-imgbox"><img src="'+f.dataUrl+'" alt="Foto '+(i+1)+'"></div><div class="pdf-caption">'+(f.legenda||( 'Foto '+(i+1)))+'</div></div>';
+            if(!forceOnePage && ((i+1) % 6) === 0 && (i+1) < photoCount){
+              bodyHtml += '</div></div><div class="page-break"></div><div class="pdf-section"><div class="pdf-section-title">Anexos de Fotos (cont.)</div><div class="pdf-imggrid">';
             }
           }
         });
-        bodyHtml += `</div></div>`;
+        bodyHtml += '</div></div>';
       }
 
-      // monta documento com footer repetido em todas as páginas
-      const footerHtml =
-        `<div class="signature-section">
-           <div class="signature-title">ASSINATURAS</div>
-           <div class="signature-grid">
-             <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Supervisão</div><div class="signature-role">Responsável pela supervisão</div></div>
-             <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Planejamento</div><div class="signature-role">Responsável pelo planejamento</div></div>
-             <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Resp. Contratante</div><div class="signature-role">Responsável pelo contratante</div></div>
-             <div class="signature-box"><div class="signature-line"></div><div class="signature-name">Resp. Contratante</div><div class="signature-role">Responsável pelo contratante</div></div>
-           </div>
-         </div>`;
+      // Assinaturas
+      const footerHtml = buildSignatureHTML();
+      const ios = isIOSDevice();
 
-      const html =
-        `<div class="pdf-doc">
-           <div class="pdf-body"><div class="pdf-content">${bodyHtml}</div></div>
-           <div class="pdf-footer-fixed">${footerHtml}</div>
-         </div>`;
+      // iOS: coloca a assinatura dentro do fluxo do conteúdo para garantir exibição
+      // Demais: manter em container no final (não precisamos repetir por página, pois forçamos 1 página)
+      let finalHtml = '';
+      if (ios){
+        finalHtml =
+          '<div class="pdf-doc">' +
+          '  <div class="pdf-body"><div class="pdf-content">'+ bodyHtml + footerHtml +'</div></div>' +
+          '</div>';
+      } else {
+        finalHtml =
+          '<div class="pdf-doc">' +
+          '  <div class="pdf-body"><div class="pdf-content">'+ bodyHtml +'</div></div>' +
+          '  <div class="pdf-footer-fixed">'+ footerHtml +'</div>' +
+          '</div>';
+      }
 
-      $('#pdf-container').html(html);
+      const $pdf = $('#pdf-container');
+      $pdf.html(finalHtml);
+
+      // Aguarda layout, ajusta para caber em 1 página e imprime
       await new Promise(r=>setTimeout(r,300));
+      fitToOnePage($pdf[0]);
+      await new Promise(r=>setTimeout(r,50));
       window.print();
     }
 
@@ -674,7 +739,7 @@
             window.__photos.push({dataUrl,legenda});
           }
         }
-        await generatePDF(formData,false);
+        await generatePDF(formData,false,true);
       });
 
       $('#previewBtn').on('click', async function(){
@@ -686,7 +751,7 @@
         if(!data.encarregado) data.encarregado='MARCIO WESLEY FANCHIOTI';
         if(!data.area) data.area='Caldeira de Recuperação';
         if(!data.clima) data.clima='ensolarado';
-        window.__photos=[]; await generatePDF(data,true);
+        window.__photos=[]; await generatePDF(data,true,true);
       });
 
       $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e){
@@ -710,7 +775,7 @@
 
     /* ===================== SIDEBAR OFF-CANVAS ===================== */
     (function(){
-      const mqMobile = window.matchMedia('(max-width: 991px)');3
+      const mqMobile = window.matchMedia('(max-width: 991px)');
       function closeSidebar(){
         document.querySelector('.sidebar')?.classList.remove('open');
         document.getElementById('sidebarBackdrop')?.classList.remove('show');
