@@ -86,6 +86,7 @@
       /* Fixar largura de área imprimível para A4 independente do dispositivo */
       #pdf-container{display:block !important;padding:0;margin:0 auto;font-size:10pt; width: calc(210mm - 10mm - 10mm);}
       #pdf-page{ width:100%; }
+      .pdf-logo{height:70px;object-fit:contain}
 
       /* As seções de info usam SEMPRE 3 colunas */
       #pdf-page .pdf-grid{ display:grid; grid-template-columns:repeat(3, 1fr); column-gap:10px; row-gap:10px; }
@@ -137,19 +138,19 @@
     .sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1030;display:none;opacity:0;transition:opacity .2s ease}
     .sidebar-backdrop.show{display:block;opacity:1}
 
-/* === PATCH: Padronização de imagens 200x200 === */
-.thumb{ width:200px; height:200px; margin:0 auto; border:2px dashed #e5e7eb; border-radius:.8rem; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.thumb img{ width:200px; height:200px; object-fit:contain; }
-.pdf-imggrid{ display:flex; flex-wrap:wrap; gap:12px; }
-.pdf-imgwrap{ flex:0 0 200px; width:200px; max-width:none; break-inside:avoid; }
-.pdf-imgbox{ width:200px; height:200px; min-height:200px; border:1px solid #ddd; border-radius:6px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.pdf-imgbox img{ width:200px; height:200px; object-fit:contain; }
-@media print{
-  .pdf-imgwrap{ flex:0 0 200px !important; width:200px !important; }
-  .pdf-imgbox{ width:200px !important; height:200px !important; }
-  .pdf-imgbox img{ width:200px !important; height:200px !important; }
-}
-/* === /PATCH === */
+    /* === PATCH: Padronização de imagens 200x200 === */
+    .thumb{ width:200px; height:200px; margin:0 auto; border:2px dashed #e5e7eb; border-radius:.8rem; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .thumb img{ width:200px; height:200px; object-fit:contain; }
+    .pdf-imggrid{ display:flex; flex-wrap:wrap; gap:12px; }
+    .pdf-imgwrap{ flex:0 0 200px; width:200px; max-width:none; break-inside:avoid; }
+    .pdf-imgbox{ width:200px; height:200px; min-height:200px; border:1px solid #ddd; border-radius:6px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .pdf-imgbox img{ width:200px; height:200px; object-fit:contain; }
+    @media print{
+      .pdf-imgwrap{ flex:0 0 200px !important; width:200px !important; }
+      .pdf-imgbox{ width:200px !important; height:200px !important; }
+      .pdf-imgbox img{ width:200px !important; height:200px !important; }
+    }
+    /* === /PATCH === */
   </style>
 </head>
 <body>
@@ -287,11 +288,11 @@
             <div id="equipe-container" class="mt-3">
               <div class="chip">
                 <div class="row g-3 align-items-end">
-                  <div class="col-lg-5">
+                  <div class="col-lg-6">
                     <label class="form-label">Nome do Funcionário</label>
                     <input type="text" class="form-control" name="funcionario[]" required />
                   </div>
-                  <div class="col-lg-3">
+                  <div class="col-lg-6">
                     <label class="form-label">Função</label>
                     <select class="form-select" name="funcao[]">
                       <option value="">Selecione...</option>
@@ -310,13 +311,6 @@
                       <option>Supervisor</option>
                       <option>Coordenador</option>
                     </select>
-                  </div>
-                  <div class="col-lg-4">
-                    <label class="form-label">Horário de Trabalho</label>
-                    <div class="d-flex gap-2">
-                      <input class="form-control" type="time" name="entrada[]" />
-                      <input class="form-control" type="time" name="saida[]" />
-                    </div>
                   </div>
                 </div>
                 <div class="mt-2 text-end">
@@ -382,9 +376,6 @@
     <button id="clearAllFloat" class="btn btn-outline-danger" title="Limpar tudo"><i class="fa-solid fa-trash"></i></button>
     <button id="submitBtn" class="btn btn-primary" title="Salvar e exportar"><i class="fa-solid fa-save"></i></button>
   </div>
-
-  <footer class="text-center small">RDO &copy; 2025 – Thaynison Couto</footer>
-
   <!-- Área de impressão -->
   <div id="pdf-container">
     <div id="pdf-page"></div>
@@ -424,6 +415,17 @@
     /* ===================== DADOS E HELPERS ===================== */
     const empresasData = { empresas:[ { nome:"Suzano Aracruz", unidades:["Pátio de Madeira","Caldeira de Recuperação","Caustificação","Evaporação","Estação de Tratamento Água","Estação de Tratamento Esgoto","Linha de Fibras","Secagem","Oficina Central"], obras:[ {nome:"PP LINHA 4", pc:"4502169545"}, {nome:"PP LINHA 5", pc:"4502169545"}, {nome:"TANQUE LBS", pc:"4502224736"}, {nome:"PG SECAGEM B", pc:"4502223947"}, {nome:"ATENDIMENTO AO BRANQUEAMENTO - LUCAS", pc:"4502239784"}, {nome:"ATENDIMENTO AO BRANQUEAMENTO - GUILHERME", pc:"4502239788"}, {nome:"FORNECIMENTO DE PLANEJADOR - FELIPE", pc:"4502204259"} ] }, { nome:"Suzano Mucuri", unidades:["Pátio de Madeira","Caldeira de Recuperação","Caustificação","Evaporação","Estação de Tratamento Água","Estação de Tratamento Esgoto","Linha de Fibras","Secagem","Oficina Central"], obras:[{nome:"*", pc:"*"}] }, { nome:"CGH João Neiva", unidades:["CGH"], obras:[{nome:"*", pc:"*"}] } ] };
 
+    const TURNOS = {
+      "manha": ["07:30","12:00"],
+      "tarde": ["12:00","17:18"],
+      "noite": ["19:00","00:00"],
+      "madrugada": ["01:00","04:48"],
+      "integral-dia": ["07:30","17:18"],
+      "integral-noite": ["19:00","04:48"],
+      "turno-pg-dia": ["07:30","19:00"],
+      "turno-pg-noite": ["19:00","06:00"]
+    };
+
     const toast = new bootstrap.Toast(document.getElementById('liveToast'), {delay:3000});
     function showToast(msg, type='success'){
       const el = $('#liveToast');
@@ -449,9 +451,7 @@
       $('#equipe-container .chip').each(function(){
         const nome=$(this).find("input[name='funcionario[]']").val();
         const funcao=$(this).find("select[name='funcao[]']").val();
-        const entrada=$(this).find("input[name='entrada[]']").val();
-        const saida=$(this).find("input[name='saida[]']").val();
-        if(nome) formData.equipe.push({nome:nome.trim(),funcao,entrada,saida});
+        if(nome) formData.equipe.push({nome:nome.trim(),funcao});
       });
       return formData;
     }
@@ -517,8 +517,23 @@
       const photos = window.__photos||[];
       const photoCount = photos.length;
 
+      // Valor e texto do turno selecionado
+      const turnoVal = $('#turno').val();
+      const turnoText = ($('#turno option:selected').text()||'');
+
+      // 1) Tenta horário pelo mapa estável (resistente a mudanças no label)
+      let entradaTurno = (TURNOS[turnoVal]||[])[0] || '';
+      let saidaTurno   = (TURNOS[turnoVal]||[])[1] || '';
+
+      // 2) Fallback: extrai pelos parênteses do texto, ex.: "(07:30 - 12:00)"
+      if(!entradaTurno || !saidaTurno){
+        const tm = turnoText.match(/\((\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\)/);
+        if (tm){ entradaTurno = tm[1]; saidaTurno = tm[2]; }
+      }
+
       let bodyHtml = '';
       bodyHtml += '<div class="pdf-header">' +
+                  '  <div><img src="logo.png" alt="Estel" class="pdf-logo"></div>' +
                   '  <div><h1 class="pdf-h-title">Registro Diário de Obra - RDO</h1><div>Documento de registro das atividades</div></div>' +
                   '</div>';
 
@@ -530,7 +545,7 @@
                   '  </div>' +
                   '  <div class="pdf-grid">' +
                   '    <div class="pdf-col"><div class="pdf-label">Data</div><div>' + (formData.data?formData.data.split('-').reverse().join('/'):'Não informado') + '</div></div>' +
-                  '    <div class="pdf-col"><div class="pdf-label">Turno</div><div>' + ($('#turno option:selected').text()||'Não informado') + '</div></div>' +
+                  '    <div class="pdf-col"><div class="pdf-label">Turno</div><div>' + (turnoText||'Não informado') + '</div></div>' +
                   '    <div class="pdf-col"><div class="pdf-label">Encarregado</div><div>' + (formData.encarregado||'Não informado') + '</div></div>' +
                   '  </div>' +
                   '  <div class="pdf-grid">' +
@@ -556,8 +571,15 @@
       if(formData.equipe?.length){
         bodyHtml += '<div class="pdf-section"><div class="pdf-section-title">Equipe</div>' +
                     '<table class="pdf-table"><thead><tr><th>Nome</th><th>Função</th><th>Entrada</th><th>Saída</th></tr></thead><tbody>';
-        formData.equipe.forEach(m=>{ bodyHtml += '<tr><td>'+(m.nome||'')+'</td><td>'+(m.funcao||'')+'</td><td>'+(m.entrada||'')+'</td><td>'+(m.saida||'')+'</td></tr>'; });
+        formData.equipe.forEach(m=>{
+          bodyHtml += '<tr><td>'+(m.nome||'')+'</td><td>'+(m.funcao||'')+'</td><td>'+(entradaTurno||'')+'</td><td>'+(saidaTurno||'')+'</td></tr>';
+        });
         bodyHtml += '</tbody></table></div>';
+      } else if (isPreview){
+        bodyHtml += '<div class="pdf-section"><div class="pdf-section-title">Equipe</div>' +
+                    '<table class="pdf-table"><thead><tr><th>Nome</th><th>Função</th><th>Entrada</th><th>Saída</th></tr></thead><tbody>' +
+                    '<tr><td>Funcionário Exemplo</td><td>Soldador</td><td>'+(entradaTurno||'')+'</td><td>'+(saidaTurno||'')+'</td></tr>' +
+                    '</tbody></table></div>';
       }
 
       if(photoCount){
@@ -574,7 +596,7 @@
         bodyHtml += '</div></div>';
       }
 
-      // Assinaturas no fluxo (compatível com iOS/Android/desktop)
+      // Assinaturas
       bodyHtml += buildSignatureHTML();
 
       const finalHtml =
@@ -630,11 +652,11 @@
         $('#equipe-container').append(`
           <div class="chip">
             <div class="row g-3 align-items-end">
-              <div class="col-lg-5">
+              <div class="col-lg-6">
                 <label class="form-label">Nome do Funcionário</label>
                 <input type="text" class="form-control" name="funcionario[]" required />
               </div>
-              <div class="col-lg-3">
+              <div class="col-lg-6">
                 <label class="form-label">Função</label>
                 <select class="form-select" name="funcao[]">
                   <option value="">Selecione...</option>
@@ -644,13 +666,6 @@
                   <option>Administrativo</option><option>Inspetor</option><option>Planejador</option>
                   <option>Supervisor</option><option>Coordenador</option>
                 </select>
-              </div>
-              <div class="col-lg-4">
-                <label class="form-label">Horário de Trabalho</label>
-                <div class="d-flex gap-2">
-                  <input class="form-control" type="time" name="entrada[]" />
-                  <input class="form-control" type="time" name="saida[]" />
-                </div>
               </div>
             </div>
             <div class="mt-2 text-end">
@@ -690,11 +705,11 @@
         $('#equipe-container').html(`
           <div class="chip">
             <div class="row g-3 align-items-end">
-              <div class="col-lg-5">
+              <div class="col-lg-6">
                 <label class="form-label">Nome do Funcionário</label>
                 <input type="text" class="form-control" name="funcionario[]" required />
               </div>
-              <div class="col-lg-3">
+              <div class="col-lg-6">
                 <label class="form-label">Função</label>
                 <select class="form-select" name="funcao[]">
                   <option value="">Selecione...</option>
@@ -704,13 +719,6 @@
                   <option>Administrativo</option><option>Inspetor</option><option>Planejador</option>
                   <option>Supervisor</option><option>Coordenador</option>
                 </select>
-              </div>
-              <div class="col-lg-4">
-                <label class="form-label">Horário de Trabalho</label>
-                <div class="d-flex gap-2">
-                  <input class="form-control" type="time" name="entrada[]" />
-                  <input class="form-control" type="time" name="saida[]" />
-                </div>
               </div>
             </div>
             <div class="mt-2 text-end">
@@ -757,6 +765,7 @@
         if(!data.encarregado) data.encarregado='MARCIO WESLEY FANCHIOTI';
         if(!data.area) data.area='Caldeira de Recuperação';
         if(!data.clima) data.clima='ensolarado';
+        if(!$('#turno').val()) $('#turno').val('integral-dia').trigger('change'); // turno padrão na prévia
         window.__photos=[]; await generatePDF(data,true,true);
       });
 
