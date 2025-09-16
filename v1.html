@@ -270,7 +270,7 @@
             <div id="atividades-container" class="mt-3">
               <div class="chip">
                 <label class="form-label">Descrição da atividade</label>
-                <textarea id="atividades-progressBar" class="form-control" name="atividade[]" rows="3" required placeholder="Descreva detalhadamente a atividade realizada..."></textarea>
+                <textarea class="form-control" name="atividade[]" rows="3" required placeholder="Descreva detalhadamente a atividade realizada..."></textarea>
                 <div class="mt-2 text-end">
                   <button type="button" class="btn btn-sm btn-outline-danger remove-item"><i class="fa-solid fa-trash"></i></button>
                 </div>
@@ -288,37 +288,29 @@
             <div id="equipe-container" class="mt-3">
               <div class="chip">
                 <div class="row g-3 align-items-end">
-                  <div class="col-lg-3 col-md-6">
+                  <div class="col-lg-6">
                     <label class="form-label">Nome do Funcionário</label>
                     <input type="text" class="form-control" name="funcionario[]" required />
                   </div>
-                  <div class="col-lg-3 col-md-6">
+                  <div class="col-lg-6">
                     <label class="form-label">Função</label>
                     <select class="form-select" name="funcao[]">
                       <option value="">Selecione...</option>
-                      <option>Auxiliar</option>
                       <option>Soldador</option>
                       <option>Encanador</option>
                       <option>Caldeireiro</option>
                       <option>Mecânico</option>
-                      <option>Encarregado</option>
-                      <option>Inspetor</option>
                       <option>Eletrícista</option>
+                      <option>Auxiliar</option>
                       <option>Almoxarife</option>
                       <option>Técnico de Segurança</option>
-                      <option>Administravido de Gente</option>
+                      <option>Encarregado</option>
+                      <option>Administrativo</option>
+                      <option>Inspetor</option>
                       <option>Planejador</option>
                       <option>Supervisor</option>
                       <option>Coordenador</option>
                     </select>
-                  </div>
-                  <div class="col-lg-3 col-md-6">
-                    <label class="form-label">Entrada</label>
-                    <input type="time" class="form-control hora-entrada" name="entrada[]" step="60" />
-                  </div>
-                  <div class="col-lg-3 col-md-6">
-                    <label class="form-label">Saída</label>
-                    <input type="time" class="form-control hora-saida" name="saida[]" step="60" />
                   </div>
                 </div>
                 <div class="mt-2 text-end">
@@ -421,54 +413,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     /* ===================== DADOS E HELPERS ===================== */
-    const empresasData = {
-      empresas: [
-        {
-          nome: "Suzano Aracruz",
-          unidades: [
-            "Pátio de Madeira",
-            "Caldeira de Recuperação",
-            "Caustificação",
-            "Evaporação",
-            "Estação de Tratamento Água",
-            "Estação de Tratamento Esgoto",
-            "Linha de Fibras",
-            "Secagem",
-            "Oficina Central"
-          ],
-          obras: [
-            { nome: "PP LINHA 5", pc: "4502169545" },
-            { nome: "TANQUE LBS", pc: "4502224736" },
-            { nome: "FORNECIMENTO DE PLANEJADOR - FELIPE", pc: "4502204259" },
-            { nome: "PG SECAGEM B - FELIPE", pc: "4502223947" },
-            { nome: "ATENDIMENTO AO BRANQUEAMENTO - LUCAS", pc: "4502239784" },
-            { nome: "ATENDIMENTO AO BRANQUEAMENTO - GUILHERME", pc: "4502239788" },
-            { nome: "MANUTENÇÃO DE MOTORES - LUCIANO", pc: "4502265614" },
-            { nome: "FABRICAÇÃO BY-PASS - ALEX MANHÃS", pc: "4502265592" }
-          ]
-        },
-        {
-          nome: "Suzano Mucuri",
-          unidades: [
-            "Pátio de Madeira",
-            "Caldeira de Recuperação",
-            "Caustificação",
-            "Evaporação",
-            "Estação de Tratamento Água",
-            "Estação de Tratamento Esgoto",
-            "Linha de Fibras",
-            "Secagem",
-            "Oficina Central"
-          ],
-          obras: [{ nome: "*", pc: "*" }]
-        },
-        {
-          nome: "CGH João Neiva",
-          unidades: ["CGH"],
-          obras: [{ nome: "*", pc: "*" }]
-        }
-      ]
-    };
+    const empresasData = { empresas:[ { nome:"Suzano Aracruz", unidades:["Pátio de Madeira","Caldeira de Recuperação","Caustificação","Evaporação","Estação de Tratamento Água","Estação de Tratamento Esgoto","Linha de Fibras","Secagem","Oficina Central"], obras:[ {nome:"PP LINHA 4", pc:"4502169545"}, {nome:"PP LINHA 5", pc:"4502169545"}, {nome:"TANQUE LBS", pc:"4502224736"}, {nome:"PG SECAGEM B", pc:"4502223947"}, {nome:"ATENDIMENTO AO BRANQUEAMENTO - LUCAS", pc:"4502239784"}, {nome:"ATENDIMENTO AO BRANQUEAMENTO - GUILHERME", pc:"4502239788"}, {nome:"FORNECIMENTO DE PLANEJADOR - FELIPE", pc:"4502204259"} ] }, { nome:"Suzano Mucuri", unidades:["Pátio de Madeira","Caldeira de Recuperação","Caustificação","Evaporação","Estação de Tratamento Água","Estação de Tratamento Esgoto","Linha de Fibras","Secagem","Oficina Central"], obras:[{nome:"*", pc:"*"}] }, { nome:"CGH João Neiva", unidades:["CGH"], obras:[{nome:"*", pc:"*"}] } ] };
 
     const TURNOS = {
       "manha": ["07:30","12:00"],
@@ -506,9 +451,7 @@
       $('#equipe-container .chip').each(function(){
         const nome=$(this).find("input[name='funcionario[]']").val();
         const funcao=$(this).find("select[name='funcao[]']").val();
-        const entrada=$(this).find("input[name='entrada[]']").val();
-        const saida=$(this).find("input[name='saida[]']").val();
-        if(nome) formData.equipe.push({nome:nome.trim(),funcao,entrada,saida});
+        if(nome) formData.equipe.push({nome:nome.trim(),funcao});
       });
       return formData;
     }
@@ -535,35 +478,7 @@
       );
     }
 
-    /* =============== RESOLUÇÃO DE HORÁRIOS DO TURNO (MAPA + REGEX) =============== */
-    function resolveTurnoTimes(){
-      const turnoVal = $('#turno').val();
-      const turnoText = ($('#turno option:selected').text()||'');
-      let entrada = (TURNOS[turnoVal]||[])[0] || '';
-      let saida   = (TURNOS[turnoVal]||[])[1] || '';
-      // fallback robusto: extrai do label "(HH:MM - HH:MM)"
-      if(!entrada || !saida){
-        const tm = turnoText.match(/\((\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\)/);
-        if (tm){ entrada = tm[1]; saida = tm[2]; }
-      }
-      return { entrada, saida, turnoText };
-    }
-
-    /* =============== AUTOPREENCHER ENTRADA/SAÍDA DA EQUIPE =============== */
-    function autofillEquipeTimes(){
-      const {entrada, saida} = resolveTurnoTimes();
-      $('#equipe-container .chip').each(function(){
-        const $ent = $(this).find("input[name='entrada[]']");
-        const $sai = $(this).find("input[name='saida[]']");
-        // Só sobrescreve se estiver vazio OU marcado como autofill anterior
-        if(!$ent.val() || $ent.data('autofill')){ $ent.val(entrada); $ent.attr('placeholder', entrada); $ent.data('autofill', true); }
-        else { $ent.attr('placeholder', entrada); }
-        if(!$sai.val() || $sai.data('autofill')){ $sai.val(saida); $sai.attr('placeholder', saida); $sai.data('autofill', true); }
-        else { $sai.attr('placeholder', saida); }
-      });
-    }
-
-    /* ===================== FIT-TO-ONE-PAGE (seguro para iOS) ===================== */
+    /** ===================== FIT-TO-ONE-PAGE (seguro para iOS) ===================== */
     function fitToOnePage(pageEl, containerEl){
       if(!pageEl || !containerEl) return;
       pageEl.classList.add('onepage');
@@ -602,8 +517,19 @@
       const photos = window.__photos||[];
       const photoCount = photos.length;
 
-      // Horários do turno (com fallback regex)
-      const {entrada:entradaTurno, saida:saidaTurno, turnoText} = resolveTurnoTimes();
+      // Valor e texto do turno selecionado
+      const turnoVal = $('#turno').val();
+      const turnoText = ($('#turno option:selected').text()||'');
+
+      // 1) Tenta horário pelo mapa estável (resistente a mudanças no label)
+      let entradaTurno = (TURNOS[turnoVal]||[])[0] || '';
+      let saidaTurno   = (TURNOS[turnoVal]||[])[1] || '';
+
+      // 2) Fallback: extrai pelos parênteses do texto, ex.: "(07:30 - 12:00)"
+      if(!entradaTurno || !saidaTurno){
+        const tm = turnoText.match(/\((\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\)/);
+        if (tm){ entradaTurno = tm[1]; saidaTurno = tm[2]; }
+      }
 
       let bodyHtml = '';
       bodyHtml += '<div class="pdf-header">' +
@@ -629,72 +555,44 @@
                   '  </div>' +
                   '</div>';
 
-      // === ATIVIDADES: compat sem optional chaining ===
-      if (formData && Array.isArray(formData.atividades) && formData.atividades.length > 0) {
+      if(formData.atividades?.length){
         bodyHtml += '<div class="pdf-section avoid-break"><div class="pdf-section-title">Atividades Realizadas</div><ol>';
-
-        for (var i = 0; i < formData.atividades.length; i++) {
-          var a = formData.atividades[i];
-          bodyHtml += '<li>' + (a != null ? String(a) : '') + '</li>';
-        }
-
+        formData.atividades.forEach(a=> bodyHtml += '<li>' + a + '</li>');
         bodyHtml += '</ol></div>';
-        bodyHtml += maybePageBreakAfterActivities(formData.atividades.length, !!forceOnePage);
-      } else if (typeof isPreview !== 'undefined' && isPreview) {
-        bodyHtml += '' +
-          '<div class="pdf-section avoid-break">' +
-            '<div class="pdf-section-title">Atividades Realizadas</div>' +
-            '<p><em>Exemplo de visualização</em></p>' +
-            '<ol>' +
-              '<li>Instalação de tubulação</li>' +
-              '<li>Manutenção preventiva</li>' +
-              '<li>Substituição de válvulas</li>' +
-            '</ol>' +
-          '</div>';
+        bodyHtml += maybePageBreakAfterActivities(formData.atividades.length, forceOnePage);
+      } else if(isPreview){
+        bodyHtml += '<div class="pdf-section avoid-break"><div class="pdf-section-title">Atividades Realizadas</div><p><em>Exemplo de visualização</em></p><ol><li>Instalação de tubulação</li><li>Manutenção preventiva</li><li>Substituição de válvulas</li></ol></div>';
       }
-
 
       if(formData.observacoes && formData.observacoes.trim()){
         bodyHtml += '<div class="pdf-section avoid-break"><div class="pdf-section-title">Observações</div><p>' + formData.observacoes + '</p></div>';
       }
 
-      // === EQUIPE: sempre preenche Entrada/Saída com horário do turno; permite override por colaborador ===
-      if (formData && Array.isArray(formData.equipe) && formData.equipe.length > 0) {
+      if(formData.equipe?.length){
         bodyHtml += '<div class="pdf-section"><div class="pdf-section-title">Equipe</div>' +
                     '<table class="pdf-table"><thead><tr><th>Nome</th><th>Função</th><th>Entrada</th><th>Saída</th></tr></thead><tbody>';
-        formData.equipe.forEach(m => {
-          const ent = (m.entrada && m.entrada !== '') ? m.entrada : (entradaTurno || '');
-          const sai = (m.saida && m.saida !== '') ? m.saida : (saidaTurno || '');
-          bodyHtml += '<tr><td>' + (m.nome || '') + '</td><td>' + (m.funcao || '') + '</td><td>' + (ent || '') + '</td><td>' + (sai || '') + '</td></tr>';
+        formData.equipe.forEach(m=>{
+          bodyHtml += '<tr><td>'+(m.nome||'')+'</td><td>'+(m.funcao||'')+'</td><td>'+(entradaTurno||'')+'</td><td>'+(saidaTurno||'')+'</td></tr>';
         });
         bodyHtml += '</tbody></table></div>';
-      } else if (typeof isPreview !== 'undefined' && isPreview) {
+      } else if (isPreview){
         bodyHtml += '<div class="pdf-section"><div class="pdf-section-title">Equipe</div>' +
                     '<table class="pdf-table"><thead><tr><th>Nome</th><th>Função</th><th>Entrada</th><th>Saída</th></tr></thead><tbody>' +
-                    '<tr><td>Funcionário Exemplo</td><td>Soldador</td><td>' + (entradaTurno || '') + '</td><td>' + (saidaTurno || '') + '</td></tr>' +
+                    '<tr><td>Funcionário Exemplo</td><td>Soldador</td><td>'+(entradaTurno||'')+'</td><td>'+(saidaTurno||'')+'</td></tr>' +
                     '</tbody></table></div>';
       }
 
-      // Fotos / anexos - compat sem optional chaining
-      if (photoCount && Array.isArray(photos) && photos.length > 0) {
-        var equipeLen = (formData && Array.isArray(formData.equipe)) ? formData.equipe.length : 0;
-        var onePage = !!forceOnePage;
-
-        bodyHtml += maybePageBreakBeforePhotos(equipeLen, photoCount, onePage);
+      if(photoCount){
+        bodyHtml += maybePageBreakBeforePhotos(formData.equipe?.length||0, photoCount, forceOnePage);
         bodyHtml += '<div class="pdf-section"><div class="pdf-section-title">Anexos de Fotos</div><div class="pdf-imggrid">';
-
-        for (var i = 0; i < photos.length; i++) {
-          var f = photos[i];
-          if (f && f.dataUrl) {
-            var legenda = (f.legenda && f.legenda !== '') ? f.legenda : ('Foto ' + (i + 1));
-            bodyHtml += '<div class="pdf-imgwrap"><div class="pdf-imgbox"><img src="' + f.dataUrl + '" alt="Foto ' + (i + 1) + '"></div><div class="pdf-caption">' + legenda + '</div></div>';
-
-            if (!onePage && ((i + 1) % 6) === 0 && (i + 1) < photoCount) {
+        photos.forEach((f,i)=>{
+          if(f?.dataUrl){
+            bodyHtml += '<div class="pdf-imgwrap"><div class="pdf-imgbox"><img src="'+f.dataUrl+'" alt="Foto '+(i+1)+'"></div><div class="pdf-caption">'+(f.legenda||( 'Foto '+(i+1)))+'</div></div>';
+            if(!forceOnePage && ((i+1) % 6) === 0 && (i+1) < photoCount){
               bodyHtml += '</div></div><div class="page-break"></div><div class="pdf-section"><div class="pdf-section-title">Anexos de Fotos (cont.)</div><div class="pdf-imggrid">';
             }
           }
-        }
-
+        });
         bodyHtml += '</div></div>';
       }
 
@@ -732,20 +630,11 @@
       $('#empresa').on('change', function(){ const v=$(this).val(); populateAreas(v); populateObras(v); updateProgress(); });
       $('#obra').on('change', function(){ const pc=$(this).find('option:selected').data('pc')||''; $('#obraPc').val(pc); updateProgress(); });
       $('.clima').on('click', function(){ $('.clima').removeClass('active'); $(this).addClass('active'); $('#clima').val($(this).data('clima')); updateProgress(); });
-      $('#data,#turno,#encarregado,#area').on('change', function(){ updateProgress(); autofillEquipeTimes(); });
+      $('#data,#turno,#encarregado,#area').on('change', updateProgress);
 
       // Sempre que mudar de aba, garantir que o contêiner rolável esteja no topo
-      $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
-        var cont = document.querySelector('.tab-content');
-        if (!cont) return;
-
-        // Usa a forma mais compatível do scrollTo (x, y). Se não existir, cai no scrollTop.
-        if (typeof cont.scrollTo === 'function') {
-          try { cont.scrollTo(0, 0); }
-          catch (e) { cont.scrollTop = 0; }
-        } else {
-          cont.scrollTop = 0;
-        }
+      $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(){
+        document.querySelector('.tab-content')?.scrollTo({top:0, behavior:'instant'});
       });
 
       $(document).on('click','#add-atividade', function(){
@@ -759,16 +648,15 @@
           </div>`);
       });
 
-      // Adiciona colaborador com inputs de Entrada/Saída + autofill do turno atual
       $(document).on('click','#add-funcionario', function(){
-        const html = `
+        $('#equipe-container').append(`
           <div class="chip">
             <div class="row g-3 align-items-end">
-              <div class="col-lg-3 col-md-6">
+              <div class="col-lg-6">
                 <label class="form-label">Nome do Funcionário</label>
                 <input type="text" class="form-control" name="funcionario[]" required />
               </div>
-              <div class="col-lg-3 col-md-6">
+              <div class="col-lg-6">
                 <label class="form-label">Função</label>
                 <select class="form-select" name="funcao[]">
                   <option value="">Selecione...</option>
@@ -779,30 +667,11 @@
                   <option>Supervisor</option><option>Coordenador</option>
                 </select>
               </div>
-              <div class="col-lg-3 col-md-6">
-                <label class="form-label">Entrada</label>
-                <input type="time" class="form-control hora-entrada" name="entrada[]" step="60" />
-              </div>
-              <div class="col-lg-3 col-md-6">
-                <label class="form-label">Saída</label>
-                <input type="time" class="form-control hora-saida" name="saida[]" step="60" />
-              </div>
             </div>
             <div class="mt-2 text-end">
               <button type="button" class="btn btn-sm btn-outline-danger remove-item"><i class="fa-solid fa-trash"></i></button>
             </div>
-          </div>`;
-        $('#equipe-container').append(html);
-        // Preenche automaticamente os horários desse novo colaborador
-        const $last = $('#equipe-container .chip').last();
-        const {entrada, saida} = resolveTurnoTimes();
-        $last.find("input[name='entrada[]']").val(entrada).attr('placeholder', entrada).data('autofill', true);
-        $last.find("input[name='saida[]']").val(saida).attr('placeholder', saida).data('autofill', true);
-      });
-
-      // Se o usuário editar manualmente, não sobrescrever mais nas mudanças de turno
-      $(document).on('input change', "input[name='entrada[]'], input[name='saida[]']", function(){
-        $(this).data('autofill', false);
+          </div>`);
       });
 
       $(document).on('click','.remove-item', function(){ $(this).closest('.chip').remove(); });
@@ -816,18 +685,11 @@
           </div>`);
       });
       $(document).on('change','.foto-input', function(e){
-        const file = (e.target.files && e.target.files[0]) || null;
-        const $wrap = $(this).closest('.col-md-4');
-        const $thumb = $wrap.find('.thumb');
-        if (file) {
-          const r = new FileReader();
-          r.onload = (ev) => $thumb.html(`<img src="${ev.target.result}">`);
-          r.readAsDataURL(file);
-        } else {
-          $thumb.html('<span class="text-muted">Pré-visualização</span>');
-        }
+        const file=e.target.files?.[0];
+        const $wrap=$(this).closest('.col-md-4');
+        const $thumb=$wrap.find('.thumb');
+        if(file){ const r=new FileReader(); r.onload=ev=>$thumb.html(`<img src="${ev.target.result}">`); r.readAsDataURL(file);} else {$thumb.html('<span class="text-muted">Pré-visualização</span>');}
       });
-
 
       $('#clearAllFloat').on('click', ()=>$('#confirmClearModal').modal('show'));
       $('#confirmClearBtn').on('click', function(){ $('#confirmClearModal').modal('hide');
@@ -843,11 +705,11 @@
         $('#equipe-container').html(`
           <div class="chip">
             <div class="row g-3 align-items-end">
-              <div class="col-lg-3 col-md-6">
+              <div class="col-lg-6">
                 <label class="form-label">Nome do Funcionário</label>
                 <input type="text" class="form-control" name="funcionario[]" required />
               </div>
-              <div class="col-lg-3 col-md-6">
+              <div class="col-lg-6">
                 <label class="form-label">Função</label>
                 <select class="form-select" name="funcao[]">
                   <option value="">Selecione...</option>
@@ -858,65 +720,40 @@
                   <option>Supervisor</option><option>Coordenador</option>
                 </select>
               </div>
-              <div class="col-lg-3 col-md-6">
-                <label class="form-label">Entrada</label>
-                <input type="time" class="form-control hora-entrada" name="entrada[]" step="60" />
-              </div>
-              <div class="col-lg-3 col-md-6">
-                <label class="form-label">Saída</label>
-                <input type="time" class="form-control hora-saida" name="saida[]" step="60" />
-              </div>
             </div>
             <div class="mt-2 text-end">
               <button type="button" class="btn btn-sm btn-outline-danger remove-item"><i class="fa-solid fa-trash"></i></button>
             </div>
           </div>`);
-        populateEmpresas(); setToday(); updateProgress(); autofillEquipeTimes(); showToast('Formulário limpo');
+        $('#fotos-container').html(`
+          <div class="col-md-4">
+            <div class="thumb"><span class="text-muted">Pré-visualização</span></div>
+            <input class="form-control foto-input" type="file" accept="image/*" />
+            <input class="form-control form-control-sm mt-2 foto-legenda" placeholder="Legenda da foto" />
+          </div>`);
+        populateEmpresas(); setToday(); updateProgress(); showToast('Formulário limpo');
       });
 
-      $('#submitBtn').on('click', async function () {
-        // Campos obrigatórios
-        var required = ['empresa', 'obra', 'data', 'turno', 'encarregado', 'area', 'clima'];
-        for (var r = 0; r < required.length; r++) {
-          var id = required[r];
-          if (!$('#' + id).val()) {
-            showToast('Preencha os campos obrigatórios', 'error');
-            $('#stepsNav a[href="#step-basicos"]').tab('show');
-            return;
+      $('#submitBtn').on('click', async function(){
+        const required=['empresa','obra','data','turno','encarregado','area','clima'];
+        for(const id of required){
+          if(!$('#'+id).val()){
+            showToast('Preencha os campos obrigatórios','error');
+            $('#stepsNav a[href="#step-basicos"]').tab('show'); return;
           }
         }
-
-        // Coleta
-        var formData = collectFormData() || {};
-
-        // Resolve horários do turno (sem destruturação)
-        var turno = resolveTurnoTimes() || {};
-        var entradaTurno = turno.entrada;
-        var saidaTurno   = turno.saida;
-
-        // Garante entrada/saída por colaborador (sem spread, sem map com arrow)
-        if (!Array.isArray(formData.equipe)) formData.equipe = [];
-        for (var i = 0; i < formData.equipe.length; i++) {
-          var m = formData.equipe[i] || {};
-          if (!m.entrada || m.entrada === '') m.entrada = entradaTurno;
-          if (!m.saida   || m.saida   === '') m.saida   = saidaTurno;
-          formData.equipe[i] = m; // mantém no array
-        }
-
-        // Fotos
+        const formData = collectFormData();
         window.__photos = [];
-        var $inputs = $('.foto-input');
-        for (var j = 0; j < $inputs.length; j++) {
-          var inputEl = $inputs[j];
-          var file = (inputEl && inputEl.files && inputEl.files[0]) ? inputEl.files[0] : null;
-          if (file) {
-            var dataUrl = await readFileAsDataURL(file);
-            var legenda = $(inputEl).closest('.col-md-4').find('.foto-legenda').val();
-            window.__photos.push({ dataUrl: dataUrl, legenda: legenda });
+        const $inputs = $('.foto-input');
+        for(let i=0;i<$inputs.length;i++){
+          const file=$inputs[i].files?.[0];
+          if(file){
+            const dataUrl = await readFileAsDataURL(file);
+            const legenda=$($inputs[i]).closest('.col-md-4').find('.foto-legenda').val();
+            window.__photos.push({dataUrl,legenda});
           }
         }
-
-        await generatePDF(formData, false, true);
+        await generatePDF(formData,false,true);
       });
 
       $('#previewBtn').on('click', async function(){
@@ -929,11 +766,6 @@
         if(!data.area) data.area='Caldeira de Recuperação';
         if(!data.clima) data.clima='ensolarado';
         if(!$('#turno').val()) $('#turno').val('integral-dia').trigger('change'); // turno padrão na prévia
-        // Se não houver equipe, cria um exemplo com horários do turno
-        if(!data.equipe || data.equipe.length === 0){
-          const {entrada, saida} = resolveTurnoTimes();
-          data.equipe = [{nome:'Funcionário Exemplo', funcao:'Soldador', entrada, saida}];
-        }
         window.__photos=[]; await generatePDF(data,true,true);
       });
 
@@ -954,80 +786,35 @@
           $('#resumo').html(html);
         }
       });
-
-      /* Primeiro autofill para o colaborador inicial */
-      autofillEquipeTimes();
     });
 
-    /* ===================== SIDEBAR OFF-CANVAS (compat ES5) ===================== */
-    (function () {
-      var mqMobile = (window.matchMedia ? window.matchMedia('(max-width: 991px)') : null);
-
-      function qs(sel){ return document.querySelector(sel); }
-
-      function closeSidebar() {
-        var sidebar = qs('.sidebar');
-        var backdrop = document.getElementById('sidebarBackdrop');
-        if (sidebar) sidebar.classList.remove('open');
-        if (backdrop) backdrop.classList.remove('show');
+    /* ===================== SIDEBAR OFF-CANVAS ===================== */
+    (function(){
+      const mqMobile = window.matchMedia('(max-width: 991px)');
+      function closeSidebar(){
+        document.querySelector('.sidebar')?.classList.remove('open');
+        document.getElementById('sidebarBackdrop')?.classList.remove('show');
         document.body.classList.remove('sidebar-open');
       }
-
-      function openSidebar() {
-        var sidebar = qs('.sidebar');
-        var backdrop = document.getElementById('sidebarBackdrop');
-        if (sidebar) sidebar.classList.add('open');
-        if (backdrop) backdrop.classList.add('show');
+      function openSidebar(){
+        document.querySelector('.sidebar')?.classList.add('open');
+        document.getElementById('sidebarBackdrop')?.classList.add('show');
         document.body.classList.add('sidebar-open');
       }
-
-      var menuToggle = document.getElementById('menuToggle');
-      if (menuToggle) {
-        menuToggle.addEventListener('click', function () {
-          var s = qs('.sidebar');
-          if (!s) return;
-          if (s.classList.contains('open')) closeSidebar(); else openSidebar();
-        });
-      }
-
-      var sidebarBackdrop = document.getElementById('sidebarBackdrop');
-      if (sidebarBackdrop) {
-        sidebarBackdrop.addEventListener('click', closeSidebar);
-      }
-
-      document.addEventListener('keydown', function (e) {
-        var isEsc = (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27);
-        if (isEsc) closeSidebar();
+      document.getElementById('menuToggle')?.addEventListener('click', function(){
+        const s = document.querySelector('.sidebar');
+        if (!s) return;
+        if (s.classList.contains('open')) closeSidebar(); else openSidebar();
       });
-
-      var stepsNav = document.getElementById('stepsNav');
-      if (stepsNav) {
-        stepsNav.addEventListener('click', function (e) {
-          // evita .closest(): sobe no DOM até achar .nav-link
-          var node = e.target;
-          while (node && node !== stepsNav) {
-            if (node.classList && node.classList.contains('nav-link')) break;
-            node = node.parentNode;
-          }
-          if (node && node.classList && node.classList.contains('nav-link')) {
-            if (mqMobile && mqMobile.matches) closeSidebar();
-          }
+      document.getElementById('sidebarBackdrop')?.addEventListener('click', closeSidebar);
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSidebar(); });
+      const stepsNav = document.getElementById('stepsNav');
+      if (stepsNav){
+        stepsNav.addEventListener('click', function(e){
+          if (e.target.closest('.nav-link') && mqMobile.matches) closeSidebar();
         });
       }
-
-      function onMediaChange() {
-        // ao sair do mobile, garante sidebar fechada
-        if (!mqMobile || !mqMobile.matches) closeSidebar();
-      }
-
-      // MediaQueryList: addEventListener em modernos; addListener nos antigos
-      if (mqMobile) {
-        if (typeof mqMobile.addEventListener === 'function') {
-          mqMobile.addEventListener('change', onMediaChange);
-        } else if (typeof mqMobile.addListener === 'function') {
-          mqMobile.addListener(onMediaChange);
-        }
-      }
+      mqMobile.addEventListener?.('change', () => { if (!mqMobile.matches) closeSidebar(); });
     })();
   </script>
 
